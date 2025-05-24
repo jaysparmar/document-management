@@ -78,5 +78,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'hasToken' => \App\Http\Middleware\HasToken::class,
         'cors' => \App\Http\Middleware\corsMiddleware::class,
+        'auth.jwt' => \App\Http\Middleware\ChatifyJwtAuth::class,
     ];
 }

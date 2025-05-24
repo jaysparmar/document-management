@@ -110,6 +110,15 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
   {
+    path: 'chat',
+    title: 'CHAT',
+    icon: 'message-circle',
+    class: '',
+    groupTitle: false,
+    claims: ['ALL_DOCUMENTS_VIEW_DOCUMENTS'],
+    submenu: [],
+  },
+  {
     path: 'categories',
     title: 'DOCUMENT_CATEGORIES',
     icon: 'file',

@@ -211,6 +211,14 @@ const routes: Routes = [
               ),
           },
           {
+            path: 'chat',
+            canLoad: [AuthGuard],
+            loadChildren: () =>
+              import('./chatify/chatify.module').then(
+                (m) => m.ChatifyModule
+              ),
+          },
+          {
             path: 'archived-documents',
             loadChildren: () =>
               import('./archived-document/archived-document.module').then(

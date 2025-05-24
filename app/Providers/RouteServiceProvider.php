@@ -43,6 +43,10 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('update')
                 ->prefix('update')
                 ->group(base_path('routes/update.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/chatify.php'));
         });
     }
 
