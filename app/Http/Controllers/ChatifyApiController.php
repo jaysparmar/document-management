@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Models\Users;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +16,7 @@ class ChatifyApiController extends Controller
      */
     public function getContacts(Request $request)
     {
-        $users = User::where('id', '!=', Auth::user()->id)
+        $users = Users::where('id', '!=', Auth::user()->id)
             ->get()
             ->map(function($user) {
                 return [
