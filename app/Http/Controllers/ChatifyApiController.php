@@ -115,7 +115,7 @@ class ChatifyApiController extends Controller
     {
         $query = $request->input('input');
 
-        $users = User::where('id', '!=', Auth::user()->id)
+        $users = Users::where('id', '!=', Auth::user()->id)
             ->where(function($q) use ($query) {
                 $q->where('firstName', 'LIKE', "%{$query}%")
                   ->orWhere('lastName', 'LIKE', "%{$query}%")
