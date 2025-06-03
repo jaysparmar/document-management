@@ -30,22 +30,41 @@ Route::match(['get', 'post'], '/chatify/auth', function () {
 
     // Ensure the request is authenticated with the API guard
     if (auth('api')->check()) {
+        $user = auth('api')->user();
+
         // Log the authenticated user for debugging
         \Illuminate\Support\Facades\Log::info('Authenticated user', [
-            'user_id' => auth('api')->id(),
-            'user_email' => auth('api')->user()->email
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'user_class' => get_class($user),
+            'user_properties' => [
+                'firstName' => $user->firstName ?? 'not set',
+                'lastName' => $user->lastName ?? 'not set'
+            ]
         ]);
 
-        // Set the authenticated user in the request
-        request()->setUserResolver(function () {
-            return auth('api')->user();
+        // Set the authenticated user in the request and the Auth facade
+        request()->setUserResolver(function () use ($user) {
+            return $user;
         });
 
+        // Set the default guard to 'api' for this request
+        \Illuminate\Support\Facades\Auth::shouldUse('api');
+
         try {
-            $response = Broadcast::auth(request());
+            // Create a new request with the user already resolved
+            $request = request();
+            $request->setUserResolver(function () use ($user) {
+                return $user;
+            });
+
+            // Call the Broadcast::auth method with the modified request
+            $response = Broadcast::auth($request);
+
             \Illuminate\Support\Facades\Log::info('Broadcast auth response', [
                 'response' => $response
             ]);
+
             return $response;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Broadcast auth error', [

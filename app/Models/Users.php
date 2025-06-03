@@ -65,6 +65,20 @@ class Users extends Authenticatable implements JWTSubject
         ];
     }
 
+    /**
+     * Get the data for presence channel authorization.
+     *
+     * @return array
+     */
+    public function toPresenceData()
+    {
+        return [
+            'id' => $this->id,
+            'user_id' => $this->id,
+            'name' => ($this->firstName ?? 'Unknown') . ' ' . ($this->lastName ?? 'User')
+        ];
+    }
+
     protected static function boot()
     {
         parent::boot();
