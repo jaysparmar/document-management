@@ -35,6 +35,39 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
   ngOnInit(): void {
     this.currentUser = this.securityService.getUserDetail();
     this.loadContacts();
+
+    // Subscribe to real-time message updates
+    this.sub$.sink = this.chatifyService.getMessageReceived()
+      .subscribe(data => {
+        // Check if we have a selected user and the message is from that user
+        if (this.selectedUser && data.message &&
+            (data.message.from_id === this.selectedUser.id || data.message.to_id === this.selectedUser.id)) {
+          // Add the message to the messages array
+          this.messages.push(data.message);
+
+          // Scroll to the bottom of the messages container
+          setTimeout(() => {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+          }, 100);
+        }
+      });
+
+    // Subscribe to real-time user status updates
+    this.sub$.sink = this.chatifyService.getUserStatusChanged()
+      .subscribe(data => {
+        const contactIndex = this.contacts.findIndex(contact => contact.id === data.id);
+        if (contactIndex !== -1) {
+          this.contacts[contactIndex].active_status = data.status;
+
+          // Update selected user status if it's the same user
+          if (this.selectedUser && this.selectedUser.id === data.id) {
+            this.selectedUser.active_status = data.status;
+          }
+        }
+      });
   }
 
   loadContacts(): void {
@@ -55,6 +88,9 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
   selectUser(user: any): void {
     this.selectedUser = user;
     this.loadMessages(user.id);
+
+    // Subscribe to the selected user's channel for real-time messages
+    this.chatifyService.subscribeToUser(user.id);
   }
 
   loadMessages(userId: string): void {
@@ -87,6 +123,14 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
           this.messages.push(response.message);
           this.messageForm.reset();
           this.loading = false;
+
+          // Scroll to the bottom of the messages container
+          setTimeout(() => {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+          }, 100);
         },
         error => {
           this.loading = false;
