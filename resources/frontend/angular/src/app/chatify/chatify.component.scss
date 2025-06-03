@@ -24,8 +24,9 @@
 }
 
 .contacts-list {
-  height: calc(100% - 80px);
+  height: calc(100% - 90px);
   overflow-y: auto;
+  padding-top: 10px;
 }
 
 .contact-name {

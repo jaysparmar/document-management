@@ -19,7 +19,7 @@
               <mat-list-item *ngFor="let contact of contacts"
                              [class.selected]="selectedUser && selectedUser.id === contact.id"
                              (click)="selectUser(contact)">
-                <img matListAvatar [src]="contact.avatar || 'assets/images/user.png'" [alt]="contact.name">
+                <img matListAvatar [src]="contact.avatar || 'assets/images/user.jpg'" [alt]="contact.name">
                 <div matLine class="contact-name">{{ contact.name }}</div>
                 <div matLine class="contact-status" *ngIf="contact.active_status">
                   <span class="status-indicator online"></span>
@@ -54,7 +54,7 @@
             <!-- Chat header -->
             <div class="chat-header">
               <div class="user-info">
-                <img [src]="selectedUser.avatar || 'assets/images/user.png'" [alt]="selectedUser.name" class="avatar">
+                <img [src]="selectedUser.avatar || 'assets/images/user.jpg'" [alt]="selectedUser.name" class="avatar">
                 <div class="user-details">
                   <h3>{{ selectedUser.name }}</h3>
                   <div class="status" *ngIf="selectedUser.active_status">
@@ -127,4 +127,3 @@
     </div>
   </div>
 </section>
-
