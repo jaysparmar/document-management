@@ -30,6 +30,7 @@ export class ChatifyService {
 
   private initializePusher(): void {
     // Get Pusher credentials from environment
+    const token = localStorage.getItem('bearerToken');
     this.pusher = new Pusher('2d9254cb3b57b0552c02', {
       cluster: 'ap1',
       forceTLS: true,
@@ -37,7 +38,8 @@ export class ChatifyService {
       auth: {
         headers: {
           'X-CSRF-Token': this.getCSRFToken(),
-          'X-Requested-With': 'XMLHttpRequest'
+          'X-Requested-With': 'XMLHttpRequest',
+          'Authorization': 'Bearer ' + token
         }
       }
     });
