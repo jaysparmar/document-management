@@ -32,6 +32,7 @@ use App\Http\Controllers\UserNotificationController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DocumentStatusController;
 use App\Http\Controllers\FileRequestDocumentController;
+use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\OpenAIController;
 
 /*
@@ -432,6 +433,18 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['middleware' => ['hasToken:DELETE_AI_GENERATED_DOCUMENTS']], function () {
         Route::delete('/stream-document/{id}', [OpenAIController::class, 'delete']);
     });
+
+    // Meeting routes
+    Route::get('/meetings', [MeetingController::class, 'index']);
+    Route::get('/meetings/my', [MeetingController::class, 'myMeetings']);
+    Route::post('/meetings', [MeetingController::class, 'store']);
+    Route::get('/meetings/{id}', [MeetingController::class, 'show']);
+    Route::put('/meetings/{id}', [MeetingController::class, 'update']);
+    Route::delete('/meetings/{id}', [MeetingController::class, 'destroy']);
+    Route::post('/meetings/{id}/users', [MeetingController::class, 'addUsers']);
+    Route::delete('/meetings/{meetingId}/users/{userId}', [MeetingController::class, 'removeUser']);
+    Route::post('/meetings/{id}/accept', [MeetingController::class, 'acceptInvitation']);
+    Route::get('/meetings/{id}/jitsi', [MeetingController::class, 'getJitsiInfo']);
 });
 
 Route::get('/file-extensions', [AllowFileExtensionController::class, 'index']);

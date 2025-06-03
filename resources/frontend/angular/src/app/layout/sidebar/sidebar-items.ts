@@ -119,6 +119,15 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
   {
+    path: 'meetings',
+    title: 'MEETINGS',
+    icon: 'video',
+    class: '',
+    groupTitle: false,
+    claims: [],
+    submenu: [],
+  },
+  {
     path: 'categories',
     title: 'DOCUMENT_CATEGORIES',
     icon: 'file',

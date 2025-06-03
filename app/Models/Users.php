@@ -5,6 +5,7 @@ namespace App\Models;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\UserRoles;
+use App\Models\Meeting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -52,6 +53,24 @@ class Users extends Authenticatable implements JWTSubject
     public function userNotifications()
     {
         return $this->hasMany(UserNotifications::class,'userId', 'id');
+    }
+
+    /**
+     * Get meetings created by the user.
+     */
+    public function createdMeetings()
+    {
+        return $this->hasMany(Meeting::class, 'created_by', 'id');
+    }
+
+    /**
+     * Get meetings the user is attending.
+     */
+    public function meetings()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_user', 'user_id', 'meeting_id')
+                    ->withPivot('is_accepted')
+                    ->withTimestamps();
     }
 
     public function getJWTCustomClaims()

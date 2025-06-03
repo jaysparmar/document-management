@@ -64,6 +64,7 @@ use App\Repositories\Contracts\DocumentShareableLinkRepositoryInterface;
 use App\Repositories\Contracts\DocumentStatusRepositoryInterface;
 use App\Repositories\Contracts\FileRequestDocumentRepositoryInterface;
 use App\Repositories\Contracts\FileRequestRepositoryInterface;
+use App\Repositories\Contracts\MeetingRepositoryInterface;
 use App\Repositories\Contracts\OpenAIDocumentRepositoryInterface;
 use App\Repositories\Contracts\PageHelperRepositoryInterface;
 use App\Repositories\Implementation\AIPromptTemplateRepository;
@@ -73,6 +74,7 @@ use App\Repositories\Implementation\DocumentShareableLinkRepository;
 use App\Repositories\Implementation\DocumentStatusRepository;
 use App\Repositories\Implementation\FileRequestDocumentRepository;
 use App\Repositories\Implementation\FileRequestRepository;
+use App\Repositories\Implementation\MeetingRepository;
 use App\Repositories\Implementation\OpenAIDocumentRepository;
 use App\Repositories\Implementation\PageHelperRepository;
 
@@ -121,6 +123,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DocumentStatusRepositoryInterface::class, DocumentStatusRepository::class);
         $this->app->bind(AIPromptTemplateRepositoryInterface::class, AIPromptTemplateRepository::class);
         $this->app->bind(OpenAIDocumentRepositoryInterface::class, OpenAIDocumentRepository::class);
+        $this->app->bind(MeetingRepositoryInterface::class, MeetingRepository::class);
     }
 
     /**

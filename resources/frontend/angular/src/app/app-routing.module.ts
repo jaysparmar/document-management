@@ -219,6 +219,14 @@ const routes: Routes = [
               ),
           },
           {
+            path: 'meetings',
+            canLoad: [AuthGuard],
+            loadChildren: () =>
+              import('./meeting/meeting.module').then(
+                (m) => m.MeetingModule
+              ),
+          },
+          {
             path: 'archived-documents',
             loadChildren: () =>
               import('./archived-document/archived-document.module').then(

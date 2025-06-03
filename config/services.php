@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'jitsi' => [
+        'domain' => env('JITSI_DOMAIN', 'meet.jit.si'),
+        'app_id' => env('JITSI_APP_ID', ''),
+        'app_secret' => env('JITSI_APP_SECRET', ''),
+    ],
+
 ];
