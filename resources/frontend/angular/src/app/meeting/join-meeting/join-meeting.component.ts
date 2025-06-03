@@ -109,12 +109,12 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
 
 
       const options = {
-        roomName: meetingInfo.meeting_id,
+        roomName: meetingInfo.meetingId,
         width: '100%',
         height: '100%',
         parentNode: this.jitsiContainer,
         userInfo: {
-          displayName: meetingInfo.display_name,
+          displayName: meetingInfo.displayName,
           // Use optional chaining and provide a default empty string if email is undefined
           email: jitsiConfig.email || ''
         },
