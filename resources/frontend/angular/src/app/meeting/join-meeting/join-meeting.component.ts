@@ -54,6 +54,12 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
       this.jitsiApiLoaded = true;
       this.getJitsiInfo();
     };
+    script.onerror = (error) => {
+      console.error('Error loading Jitsi script:', error);
+      this.toastrService.error(this.translateService.instant('ERROR_LOADING_JITSI'));
+      this.loading = false;
+      this.router.navigate(['/meetings']);
+    };
     document.body.appendChild(script);
   }
 
@@ -63,7 +69,9 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this.initializeJitsiMeet(response);
-          this.loading = false;
+          // Note: loading state is now managed in the initializeJitsiMeet method
+          // and its event handlers to ensure it's only set to false when the
+          // conference is actually joined or when an error occurs
         },
         (error) => {
           this.toastrService.error(this.translateService.instant('ERROR_JOINING_MEETING'));
@@ -74,43 +82,77 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
   }
 
   initializeJitsiMeet(meetingInfo: any) {
-    this.jitsiContainer = document.getElementById('jitsi-container');
+    try {
+      this.jitsiContainer = document.getElementById('jitsi-container');
 
-    const options = {
-      roomName: meetingInfo.meeting_id,
-      width: '100%',
-      height: '100%',
-      parentNode: this.jitsiContainer,
-      userInfo: {
-        displayName: meetingInfo.display_name,
-        email: meetingInfo.jitsi_config.email
-      },
-      configOverwrite: {
-        startWithAudioMuted: true,
-        startWithVideoMuted: false
-      },
-      interfaceConfigOverwrite: {
-        TOOLBAR_BUTTONS: [
-          'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-          'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
-          'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
-          'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
-          'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
-          'security'
-        ]
+      if (!this.jitsiContainer) {
+        throw new Error('Jitsi container element not found');
       }
-    };
 
-    if (meetingInfo.jitsi_config.jwt) {
-      options['jwt'] = meetingInfo.jitsi_config.jwt;
+      const options = {
+        roomName: meetingInfo.meeting_id,
+        width: '100%',
+        height: '100%',
+        parentNode: this.jitsiContainer,
+        userInfo: {
+          displayName: meetingInfo.display_name,
+          email: meetingInfo.jitsi_config.email
+        },
+        configOverwrite: {
+          startWithAudioMuted: true,
+          startWithVideoMuted: false,
+          prejoinPageEnabled: false
+        },
+        interfaceConfigOverwrite: {
+          TOOLBAR_BUTTONS: [
+            'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+            'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+            'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+            'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+            'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
+            'security'
+          ],
+          SHOW_JITSI_WATERMARK: false,
+          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+        }
+      };
+
+      if (meetingInfo.jitsi_config.jwt) {
+        options['jwt'] = meetingInfo.jitsi_config.jwt;
+      }
+
+      // Check if JitsiMeetExternalAPI is available
+      if (typeof JitsiMeetExternalAPI === 'undefined') {
+        console.log("error");
+        throw new Error('Jitsi Meet External API not loaded');
+      }
+
+      // Create the Jitsi Meet API instance
+      this.jitsiMeetApi = new JitsiMeetExternalAPI(meetingInfo.jitsi_config.domain, options);
+
+      // Add event listeners
+      this.jitsiMeetApi.addEventListeners({
+        readyToClose: this.handleClose.bind(this),
+        videoConferenceJoined: () => {
+          console.log('User has joined the conference');
+          this.loading = false;
+        },
+        videoConferenceLeft: () => {
+          console.log('User has left the conference');
+          this.handleClose();
+        },
+        error: (error) => {
+          console.error('Jitsi Meet Error:', error);
+          this.toastrService.error(this.translateService.instant('ERROR_JOINING_MEETING'));
+          this.loading = false;
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing Jitsi Meet:', error);
+      this.toastrService.error(this.translateService.instant('ERROR_INITIALIZING_MEETING'));
+      this.loading = false;
+      this.router.navigate(['/meetings']);
     }
-
-    // @ts-ignore
-    this.jitsiMeetApi = new JitsiMeetExternalAPI(meetingInfo.jitsi_config.domain, options);
-
-    this.jitsiMeetApi.addEventListeners({
-      readyToClose: this.handleClose.bind(this)
-    });
   }
 
   handleClose() {
