@@ -243,16 +243,7 @@ class MeetingController extends Controller
             ]
         );
 
-        // Generate JWT token if using secure Jitsi
-        $jwt = $this->jitsiService->generateJWT(
-            $meeting->jitsi_meeting_id,
-            $displayName,
-            $user->email
-        );
 
-        if ($jwt) {
-            $jitsiConfig['jwt'] = $jwt;
-        }
 
         return response()->json([
             'meeting_id' => $meeting->jitsi_meeting_id,

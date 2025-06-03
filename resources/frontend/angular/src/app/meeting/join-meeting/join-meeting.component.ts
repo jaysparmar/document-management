@@ -6,6 +6,9 @@ import { ToastrService } from 'ngx-toastr';
 import { BaseComponent } from 'src/app/base.component';
 import { MeetingService } from '../meeting.service';
 
+// Declare the JitsiMeetExternalAPI type
+declare var JitsiMeetExternalAPI: any;
+
 @Component({
   selector: 'app-join-meeting',
   templateUrl: './join-meeting.component.html',
@@ -68,6 +71,9 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
     this.sub$.sink = this.meetingService.getJitsiInfo(this.meetingId)
       .subscribe(
         (response: any) => {
+          console.log(response)
+
+
           this.initializeJitsiMeet(response);
           // Note: loading state is now managed in the initializeJitsiMeet method
           // and its event handlers to ensure it's only set to false when the
@@ -83,11 +89,24 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
 
   initializeJitsiMeet(meetingInfo: any) {
     try {
+      // Debug: Log the meetingInfo object to see its structure
+      console.log('Meeting Info:', meetingInfo);
+
+      // Validate meetingInfo object
+      if (!meetingInfo || !meetingInfo.meetingId || !meetingInfo.displayName) {
+        throw new Error('Invalid meeting information');
+      }
+
       this.jitsiContainer = document.getElementById('jitsi-container');
 
       if (!this.jitsiContainer) {
         throw new Error('Jitsi container element not found');
       }
+
+      // Ensure jitsi_config exists
+      const jitsiConfig = meetingInfo.jitsiConfig || {};
+      const domain = jitsiConfig.domain || 'meet.jit.si';
+
 
       const options = {
         roomName: meetingInfo.meeting_id,
@@ -96,12 +115,14 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
         parentNode: this.jitsiContainer,
         userInfo: {
           displayName: meetingInfo.display_name,
-          email: meetingInfo.jitsi_config.email
+          // Use optional chaining and provide a default empty string if email is undefined
+          email: jitsiConfig.email || ''
         },
         configOverwrite: {
-          startWithAudioMuted: true,
-          startWithVideoMuted: false,
-          prejoinPageEnabled: false
+          defaultLanguage: 'en',
+          // startWithAudioMuted: true,
+          // startWithVideoMuted: false,
+          // prejoinPageEnabled: false
         },
         interfaceConfigOverwrite: {
           TOOLBAR_BUTTONS: [
@@ -109,32 +130,32 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
             'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
             'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
             'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
-            'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
-            'security'
+            'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone'
           ],
           SHOW_JITSI_WATERMARK: false,
           DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
         }
       };
 
-      if (meetingInfo.jitsi_config.jwt) {
-        options['jwt'] = meetingInfo.jitsi_config.jwt;
-      }
+
 
       // Check if JitsiMeetExternalAPI is available
       if (typeof JitsiMeetExternalAPI === 'undefined') {
-        console.log("error");
+        console.error('Jitsi Meet External API not loaded');
         throw new Error('Jitsi Meet External API not loaded');
       }
 
       // Create the Jitsi Meet API instance
-      this.jitsiMeetApi = new JitsiMeetExternalAPI(meetingInfo.jitsi_config.domain, options);
+      this.jitsiMeetApi = new JitsiMeetExternalAPI(domain, options);
+      console.log('Jitsi Meet API created successfully:', this.jitsiMeetApi);
 
       // Add event listeners
+      console.log('Adding event listeners to Jitsi Meet API');
       this.jitsiMeetApi.addEventListeners({
         readyToClose: this.handleClose.bind(this),
         videoConferenceJoined: () => {
           console.log('User has joined the conference');
+          console.log('Setting loading to false');
           this.loading = false;
         },
         videoConferenceLeft: () => {

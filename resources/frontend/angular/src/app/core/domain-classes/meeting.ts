@@ -23,9 +23,6 @@ export interface JitsiConfig {
     domain: string;
     roomName: string;
     displayName: string;
-    appId?: string;
-    appSecret?: string;
-    jwt?: string;
     email?: string;
     startTime?: Date;
     endTime?: Date;
