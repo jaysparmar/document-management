@@ -49,7 +49,7 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
+    this.loading = false;
     const script = document.createElement('script');
     script.src = 'https://meet.jit.si/external_api.js';
     script.async = true;
@@ -67,7 +67,7 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
   }
 
   getJitsiInfo() {
-    this.loading = true;
+
     this.sub$.sink = this.meetingService.getJitsiInfo(this.meetingId)
       .subscribe(
         (response: any) => {
