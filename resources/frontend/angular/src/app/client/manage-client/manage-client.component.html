@@ -78,6 +78,36 @@
                   </div>
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>{{ "PASSWORD" | translate }}</label>
+                  <input
+                    formControlName="password"
+                    class="form-control"
+                    type="password"
+                    [placeholder]="isEditMode ? ('LEAVE_BLANK_TO_KEEP_CURRENT_PASSWORD' | translate) : ''"
+                  />
+                  <div
+                    *ngIf="
+                      clientForm.get('password').touched &&
+                      clientForm.get('password').errors
+                    "
+                  >
+                    <div
+                      class="text-danger"
+                      *ngIf="clientForm.get('password').errors?.['required']"
+                    >
+                      {{ "PASSWORD_IS_REQUIRED" | translate }}
+                    </div>
+                    <div
+                      class="text-danger"
+                      *ngIf="clientForm.get('password').errors?.['minlength']"
+                    >
+                      {{ "PASSWORD_MUST_BE_AT_LEAST_6_CHARACTERS" | translate }}
+                    </div>
+                  </div>
+                </div>
+              </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label>{{ "MOBILE_NUMBER" | translate }}</label>

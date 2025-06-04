@@ -30,15 +30,22 @@ class ClientController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 409);
         }
-        return  response($this->clientRepositoryInterface->update($request->all(), $id), 201);
+
+        $data = $request->all();
+        // If password is empty, remove it from the data to keep the existing password
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
+
+        return response($this->clientRepositoryInterface->update($data, $id), 201);
     }
 
     public function create(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'companyName' => "required:clients,companyName,NULL,id,deleted_at,NULL",
-            'email' => "required|unique:clients,email,NULL,id,deleted_at,NULL"
+            'email' => "required|unique:clients,email,NULL,id,deleted_at,NULL",
+            'password' => "required|min:6"
         ]);
 
         if ($validator->fails()) {

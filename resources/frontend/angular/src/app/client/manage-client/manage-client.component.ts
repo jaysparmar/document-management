@@ -68,6 +68,7 @@ export class ManageClientComponent extends BaseComponent implements OnInit {
       contactPerson: [''],
       lastName: [''],
       email: ['', [Validators.required, Validators.email]],
+      password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
       phoneNumber: [''],
       address: [''],
     });
@@ -110,6 +111,7 @@ export class ManageClientComponent extends BaseComponent implements OnInit {
       id: this.clientForm.get('id').value,
       contactPerson: this.clientForm.get('contactPerson').value,
       email: this.clientForm.get('email').value,
+      password: this.clientForm.get('password').value,
       phoneNumber: this.clientForm.get('phoneNumber').value,
       address: this.clientForm.get('address').value,
       companyName: this.clientForm.get('companyName').value,

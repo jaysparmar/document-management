@@ -409,6 +409,8 @@
   "CLIENT_UPDATED_SUCCESSFULLY": "Client Updated Successfully",
   "SELECT_CLIENT": "Select Client",
   "CLIENT": "Client",
+  "LEAVE_BLANK_TO_KEEP_CURRENT_PASSWORD": "Leave blank to keep current password",
+  "PASSWORD_MUST_BE_AT_LEAST_6_CHARACTERS": "Password must be at least 6 characters",
   "EDIT_CLIENTS": "Edit Clients",
   "DELETE_CLIENTS": "Delete Clients",
   "VIEW_CLIENTS": "View Clients",

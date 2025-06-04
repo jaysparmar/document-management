@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,11 +21,24 @@ class Clients extends Model
     const CREATED_AT = 'createdDate';
     const UPDATED_AT = 'modifiedDate';
 
-    protected $hidden = ['createdBy', 'modifiedBy', 'deletedBy', 'createdDate', 'modifiedDate', 'isDeleted', 'deleted_at'];
+    protected $hidden = ['password', 'createdBy', 'modifiedBy', 'deletedBy', 'createdDate', 'modifiedDate', 'isDeleted', 'deleted_at'];
 
     protected $fillable = [
-        'id', 'companyName', 'contactPerson', 'email', 'phoneNumber', 'address',
+        'id', 'companyName', 'contactPerson', 'email', 'password', 'phoneNumber', 'address',
     ];
+
+    /**
+     * Set the password attribute.
+     *
+     * @param string $value
+     * @return void
+     */
+    public function setPasswordAttribute($value)
+    {
+        if (!empty($value)) {
+            $this->attributes['password'] = Hash::make($value);
+        }
+    }
 
     protected static function boot()
     {
