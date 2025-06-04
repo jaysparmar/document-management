@@ -7,7 +7,7 @@ use App\Repositories\Contracts\BaseRepositoryInterface;
 interface DocumentRepositoryInterface extends BaseRepositoryInterface
 {
     public function getDocuments($attributes);
-    public function saveDocument($request, $path, $fileSize);
+    public function saveDocument($request, $path, $fileSize, $attachmentPaths = []);
     public function getDocumentsCount($attributes);
     public function updateDocument($request, $id);
     public function assignedDocuments($attributes);

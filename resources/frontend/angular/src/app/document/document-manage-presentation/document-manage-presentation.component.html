@@ -34,6 +34,36 @@
                   </div>
                 </div>
                 <div class="col-md-3">
+                  <label class="form-label">{{'ATTACHMENTS' | translate}}</label>
+                  <input class="form-control" #attachmentFiles (change)="uploadAttachment(attachmentFiles.files)" type="file" multiple>
+                  <small class="form-text text-muted">{{'MULTIPLE_FILES_ALLOWED' | translate}}</small>
+                </div>
+                <div class="col-md-12 mt-3" *ngIf="attachments.length > 0">
+                  <label class="form-label">{{'UPLOADED_ATTACHMENTS' | translate}}</label>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>{{'NAME' | translate}}</th>
+                          <th>{{'EXTENSION' | translate}}</th>
+                          <th>{{'ACTIONS' | translate}}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let attachment of attachments; let i = index">
+                          <td>{{attachment.name}}</td>
+                          <td>{{attachment.extension}}</td>
+                          <td>
+                            <button type="button" class="btn btn-sm btn-danger" (click)="removeAttachment(i)">
+                              <i-feather name="trash" class="small-icon"></i-feather>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-md-3">
                   <label class="form-label">{{'NAME' | translate}}</label>
                   <input formControlName="name" class="form-control" type="text">
                   <div class="text-danger"

@@ -4,6 +4,16 @@ import { DocumentUserPermission } from './document-user-permission';
 import { DocumentMetaData } from './documentMetaData';
 import { DocumentVersion } from './documentVersion';
 
+export interface DocumentAttachment {
+  id?: string;
+  documentId?: string;
+  name?: string;
+  url?: string;
+  extension?: string;
+  fileData?: any;
+  location?: string;
+}
+
 export interface DocumentInfo {
   id?: string;
   name?: string;
@@ -35,4 +45,5 @@ export interface DocumentInfo {
   updatedByName?: string;
   modifiedDate?: Date;
   companyName?: string;
+  documentAttachments?: DocumentAttachment[];
 }

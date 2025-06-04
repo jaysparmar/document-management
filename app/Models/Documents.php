@@ -106,6 +106,11 @@ class Documents extends Model
         return $this->hasMany(DocumentAuditTrails::class, 'documentId');
     }
 
+    public function documentAttachments()
+    {
+        return $this->hasMany(DocumentAttachments::class, 'documentId');
+    }
+
     protected static function boot()
     {
         parent::boot();

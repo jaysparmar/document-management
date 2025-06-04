@@ -20,7 +20,7 @@ import {
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { AllowFileExtension } from '@core/domain-classes/allow-file-extension';
 import { Category } from '@core/domain-classes/category';
-import { DocumentInfo } from '@core/domain-classes/document-info';
+import { DocumentAttachment, DocumentInfo } from '@core/domain-classes/document-info';
 import { DocumentMetaData } from '@core/domain-classes/documentMetaData';
 import { FileInfo } from '@core/domain-classes/file-info';
 import { Role } from '@core/domain-classes/role';
@@ -32,6 +32,7 @@ import { BaseComponent } from 'src/app/base.component';
 import { CategoryStore } from 'src/app/category/store/category-store';
 import { ClientStore } from 'src/app/client/client-store';
 import { DocumentStatusStore } from 'src/app/document-status/store/document-status.store';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-document-manage-presentation',
@@ -63,6 +64,7 @@ export class DocumentManagePresentationComponent
   clientStore = inject(ClientStore);
   documentstatusStore = inject(DocumentStatusStore);
   categoryStore = inject(CategoryStore);
+  attachments: DocumentAttachment[] = [];
   get documentMetaTagsArray(): FormArray {
     return <FormArray>this.documentForm.get('documentMetaTags');
   }
@@ -72,7 +74,8 @@ export class DocumentManagePresentationComponent
     private cd: ChangeDetectorRef,
     private commonService: CommonService,
     private securityService: SecurityService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private toastrService: ToastrService
   ) {
     super();
     this.minDate = new Date();
@@ -257,6 +260,7 @@ export class DocumentManagePresentationComponent
       extension: this.extension,
       location: this.documentForm.get('location').value,
       clientId: this.documentForm.get('clientId').value ?? '',
+      documentAttachments: this.attachments,
     };
     const selectedRoles: Role[] =
       this.documentForm.get('selectedRoles').value ?? [];
@@ -322,6 +326,38 @@ export class DocumentManagePresentationComponent
     this.fileData = files[0];
     this.documentForm.get('url').setValue(files[0].name);
     this.documentForm.get('name').setValue(files[0].name);
+  }
+
+  uploadAttachment(files) {
+    if (files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const extension = file.name.split('.').pop();
+
+      if (!this.fileExtesionValidation(extension)) {
+        this.toastrService.error(
+          this.translationService.getValue('FILE_TYPE_NOT_ALLOWED')
+        );
+        continue;
+      }
+
+      const attachment: DocumentAttachment = {
+        name: file.name,
+        extension: extension,
+        fileData: file,
+        location: this.documentForm.get('location').value
+      };
+
+      this.attachments.push(attachment);
+    }
+
+    this.cd.markForCheck();
+  }
+
+  removeAttachment(index: number) {
+    this.attachments.splice(index, 1);
+    this.cd.markForCheck();
   }
 
   roleTimeBoundChange(event: MatCheckboxChange) {

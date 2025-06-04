@@ -60,6 +60,16 @@ export class DocumentService {
       JSON.stringify(document.documentUserPermissions ?? [])
     );
 
+    // Add attachments
+    if (document.documentAttachments && document.documentAttachments.length > 0) {
+      document.documentAttachments.forEach((attachment, index) => {
+        formData.append(`attachments[${index}]`, attachment.fileData);
+        formData.append(`attachmentNames[${index}]`, attachment.name);
+        formData.append(`attachmentExtensions[${index}]`, attachment.extension);
+        formData.append(`attachmentLocations[${index}]`, attachment.location || document.location || 'local');
+      });
+    }
+
     return this.httpClient
       .post<DocumentInfo>(url, formData)
       .pipe(catchError(this.commonHttpErrorService.handleError));

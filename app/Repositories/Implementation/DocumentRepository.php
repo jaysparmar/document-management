@@ -246,7 +246,7 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
         return $results;
     }
 
-    public function saveDocument($request, $path, $fileSize)
+    public function saveDocument($request, $path, $fileSize, $attachmentPaths = [])
     {
         try {
             $isIndexed = $fileSize < 3000000;
@@ -264,6 +264,17 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
             $model->save();
             $this->resetModel();
             $result = $this->parseResult($model);
+
+            // Save attachments
+            foreach ($attachmentPaths as $attachment) {
+                \App\Models\DocumentAttachments::create([
+                    'documentId' => $result->id,
+                    'name' => $attachment['name'],
+                    'url' => $attachment['path'],
+                    'extension' => $attachment['extension'],
+                    'location' => $attachment['location']
+                ]);
+            }
 
             foreach (json_decode($metaDatas) as $metaTag) {
                 DocumentMetaDatas::create(array(

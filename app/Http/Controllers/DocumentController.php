@@ -208,12 +208,49 @@ class DocumentController extends Controller
                     'message' => 'Error in storing document in ' . $location,
                 ], 409);
             }
+
+            // Process attachments
+            $attachmentPaths = [];
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $index => $attachmentFile) {
+                    if ($attachmentFile->isValid()) {
+                        $attachmentLocation = $request->input("attachmentLocations.$index") ?? $location;
+
+                        // Check S3 configuration if using S3
+                        if ($attachmentLocation == 's3') {
+                            $s3Key = config('filesystems.disks.s3.key');
+                            $s3Secret = config('filesystems.disks.s3.secret');
+                            $s3Region = config('filesystems.disks.s3.region');
+                            $s3Bucket = config('filesystems.disks.s3.bucket');
+
+                            if (empty($s3Key) || empty($s3Secret) || empty($s3Region) || empty($s3Bucket)) {
+                                continue; // Skip this attachment if S3 config is missing
+                            }
+                        }
+
+                        $attachmentPath = $attachmentFile->storeAs(
+                            'document-attachments',
+                            Uuid::uuid4() . '.' . $attachmentFile->getClientOriginalExtension(),
+                            $attachmentLocation
+                        );
+
+                        if ($attachmentPath) {
+                            $attachmentPaths[] = [
+                                'path' => $attachmentPath,
+                                'name' => $request->input("attachmentNames.$index"),
+                                'extension' => $request->input("attachmentExtensions.$index"),
+                                'location' => $attachmentLocation
+                            ];
+                        }
+                    }
+                }
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => 'Error in storing document in ' . $location,
             ], 409);
         }
-        return $this->documentRepository->saveDocument($request, $path, $fileSize);
+        return $this->documentRepository->saveDocument($request, $path, $fileSize, $attachmentPaths);
     }
 
     public function updateDocument(Request $request, $id)
