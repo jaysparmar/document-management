@@ -2,20 +2,18 @@
 
 namespace App\Models;
 
-use Ramsey\Uuid\Uuid;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Builder;
 
-class Clients extends Model
+class Clients extends Authenticatable
 {
     use HasFactory, SoftDeletes;
     use Notifiable, Uuids;
+
     protected $primaryKey = "id";
     public $table = 'clients';
     const CREATED_AT = 'createdDate';
@@ -38,6 +36,21 @@ class Clients extends Model
         if (!empty($value)) {
             $this->attributes['password'] = Hash::make($value);
         }
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'client_id');
+    }
+
+    public function pendingDocuments()
+    {
+        return $this->documents()->where('status', 'pending');
+    }
+
+    public function approvedDocuments()
+    {
+        return $this->documents()->where('status', 'approved');
     }
 
     protected static function boot()

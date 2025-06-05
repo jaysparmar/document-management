@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\AngularController;
+use App\Http\Controllers\Client\AuthController;
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProfileController;
+use App\Http\Controllers\Client\DocumentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,14 +23,23 @@ use App\Http\Controllers\AngularController;
 //     return view('angular');
 // });
 
+// ✅ Allow access to login page without auth
 Route::prefix('client-portal')->group(function () {
     Route::get('/login', function () {
         return view('client.auth.login');
     })->name('client-portal.login');
-    Route::get('/', function () {
-        return view('client.dashboard');
-    })->name('client-portal.home');
+    Route::post('/authenticate', [AuthController::class, 'authenticate'])->name('client-portal.authenticate');
 });
+
+// ✅ Protect only authenticated client routes
+Route::prefix('client-portal')->name('client-portal.')->middleware('auth:client')->group(function () {
+
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::resource('documents', DocumentController::class);
+    Route::resource('profile', ProfileController::class);
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
 
 // Custom route for Pusher authentication
 Route::match(['get', 'post'], '/chatify/auth', function () {

@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Client;
 
-class AuthController extends Controller
+class ProfileController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -64,30 +61,5 @@ class AuthController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    /**
-     * Authenticate the client and log them in.
-     */
-    public function authenticate(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
-
-        // Attempt to log in using the 'client' guard (if you have a custom guard)
-        if (Auth::guard('client')->attempt($credentials)) {
-            $request->session()->regenerate();
-            return response()->json([
-                'error' => false,
-                'message' => 'Logged in successfully.'
-            ], 200);
-        }
-        // If authentication fails, return an error response
-        return response()->json([
-            'error' => true,
-            'message' => 'The provided credentials do not match our records.'
-        ], 401);
     }
 }

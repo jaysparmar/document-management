@@ -51,8 +51,14 @@ class Handler extends ExceptionHandler
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return $request->expectsJson()
-            ? response()->json(['message' => 'Toekn is Expired.'], 401)
-            : redirect()->guest(route('authentication.index'));
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Token is Expired.'], 401);
+        }
+
+        if ($request->is('client-portal') || $request->is('client-portal/*')) {
+            return redirect()->guest(route('client-portal.login'));
+        }
+
+        return redirect()->guest(route('login'));
     }
 }
