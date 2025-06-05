@@ -19,6 +19,15 @@ use App\Http\Controllers\AngularController;
 //     return view('angular');
 // });
 
+Route::prefix('client-portal')->group(function () {
+    Route::get('/login', function () {
+        return view('client.auth.login');
+    })->name('client-portal.login');
+    Route::get('/', function () {
+        return view('client.dashboard');
+    })->name('client-portal.home');
+});
+
 // Custom route for Pusher authentication
 Route::match(['get', 'post'], '/chatify/auth', function () {
     // Log the request for debugging
