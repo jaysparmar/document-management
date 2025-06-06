@@ -81,7 +81,6 @@ class ChatifyApiController extends Controller
         }
 
 
-        dd($message);
 
         $message->save();
 
