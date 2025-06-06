@@ -50,6 +50,32 @@
                                             <span><textarea [disabled]="true"
                                                     class="form-control-plaintext">{{documentInfo.description}}</textarea></span>
                                         </div>
+                                        <div class="col-md-12" *ngIf="documentInfo.documentAttachments && documentInfo.documentAttachments.length > 0">
+                                            <label class="fw-bold">{{'ATTACHMENTS' | translate }} :</label>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>{{'NAME' | translate}}</th>
+                                                            <th>{{'EXTENSION' | translate}}</th>
+                                                            <th>{{'ACTIONS' | translate}}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let attachment of documentInfo.documentAttachments">
+                                                            <td>{{attachment.name}}</td>
+                                                            <td>{{attachment.extension}}</td>
+                                                            <td>
+                                                                <a [href]="attachment.url" target="_blank" class="btn btn-sm btn-primary">
+                                                                    <i-feather name="download" class="small-icon"></i-feather>
+                                                                    {{'DOWNLOAD' | translate}}
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                         <div class="col-md-3 mt-0 mb-0"
                                             *hasClaim="['ALL_DOCUMENTS_EDIT_DOCUMENT','ASSIGNED_DOCUMENTS_EDIT_DOCUMENT']">
                                             <button (click)="editDocument()" class="btn btn-success btn-sm"

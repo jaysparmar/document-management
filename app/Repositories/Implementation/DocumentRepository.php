@@ -738,6 +738,11 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
 
         $document = $query->first();
 
+        if ($document) {
+            // Load document attachments
+            $document->load('documentAttachments');
+        }
+
         return $document;
     }
 
