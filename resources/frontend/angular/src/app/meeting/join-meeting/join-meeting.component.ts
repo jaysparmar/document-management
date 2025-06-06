@@ -77,7 +77,7 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
 
           // Get the domain from the response
           const jitsiConfig = response.jitsiConfig || {};
-          const domain = jitsiConfig.domain || 'meet.jit.si';
+          const domain = jitsiConfig.domain || 'meet.guifi.net';
 
           // Load the script from the correct domain
           this.loadJitsiScript(domain)
@@ -127,7 +127,7 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
 
       // Ensure jitsi_config exists
       const jitsiConfig = meetingInfo.jitsiConfig || {};
-      const domain = jitsiConfig.domain || 'meet.jit.si';
+      const domain = jitsiConfig.domain || 'meet.guifi.net';
       const jwt = jitsiConfig.jwt || null;
 
       // Debug: Log JWT token and domain
@@ -178,6 +178,16 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
           startVideoOnly: false,
           // Disable waiting for moderator
           startSilent: false,
+          // Explicitly disable moderator approval
+          startWithModeratorApproval: false,
+          // Disable prejoin screen
+          prejoinConfig: {
+            enabled: false
+          },
+          // Set roles required to be moderators
+          moderatorRoles: ['owner'],
+          // No moderator password
+          moderatorPW: '',
           // Disable lobby and other features that might prevent users from joining
           enableLobby: false,
           requireDisplayName: false,
@@ -192,11 +202,13 @@ export class JoinMeetingComponent extends BaseComponent implements OnInit {
           // Enable user roles based on token
           enableUserRolesBasedOnToken: true,
           enableFeaturesBasedOnToken: true,
+          // Set the authenticated user as a moderator
+          startAsGuest: false,
           // Disable token requirements
           disableThirdPartyRequests: true,
           disableLocalVideoFlip: true,
           // Set authenticated domain
-          // anonymousdomain: 'guest.meet.jit.si', // Remove this line as it might cause issues
+          // anonymousdomain: 'guest.meet.guifi.net', // Remove this line as it might cause issues
           enableDisplayNameInStats: false,
           // Allow any domain
           domainCheck: false,

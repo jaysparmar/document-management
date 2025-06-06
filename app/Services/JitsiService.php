@@ -23,7 +23,7 @@ class JitsiService
      */
     public function getJitsiDomain()
     {
-        return config('services.jitsi.domain', 'meet.jit.si');
+        return config('services.jitsi.domain', 'meet.guifi.net');
     }
 
     /**
@@ -39,6 +39,11 @@ class JitsiService
     {
         // Check if JWT is enabled in config
         if (!config('services.jitsi.jwt.enabled', false)) {
+            return null;
+        }
+
+        // If using the public Jitsi server, don't use JWT as it requires specific configuration
+        if ($this->getJitsiDomain() === 'meet.guifi.net') {
             return null;
         }
 
@@ -61,7 +66,15 @@ class JitsiService
                     'id' => $userId,
                     'name' => $userName,
                     'email' => $userEmail,
-                    'moderator' => true
+                    'moderator' => true,
+                    'affiliation' => 'owner'
+                ],
+                'features' => [
+                    'livestreaming' => true,
+                    'recording' => true,
+                    'outbound-call' => true,
+                    'transcription' => true,
+                    'screen-sharing' => true
                 ]
             ]
         ];
@@ -92,6 +105,16 @@ class JitsiService
             'domain' => $domain,
             'roomName' => $meetingId,
             'displayName' => $displayName,
+            // Add server-side configuration to ensure the authenticated user is set as a moderator
+            'startWithVideoMuted' => false,
+            'startWithAudioMuted' => false,
+            'startWithModeratorApproval' => false,
+            'requireModeratorEnabled' => false,
+            'moderatorRoles' => ['owner'],
+            'startSilent' => false,
+            'enableLobby' => false,
+            'moderatorPW' => '',
+            'userRole' => 'moderator',
         ];
 
         // Add JWT token if user info is provided
