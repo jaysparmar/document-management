@@ -27,6 +27,55 @@ class JitsiService
     }
 
     /**
+     * Generate a JWT token for Jitsi authentication
+     *
+     * @param string $userId
+     * @param string $userName
+     * @param string $userEmail
+     * @param string $roomName
+     * @return string|null
+     */
+    public function generateJWT($userId, $userName, $userEmail, $roomName)
+    {
+        // Check if JWT is enabled in config
+        if (!config('services.jitsi.jwt.enabled', false)) {
+            return null;
+        }
+
+        $key = config('services.jitsi.jwt.key');
+        $appId = config('services.jitsi.jwt.app_id');
+
+        if (empty($key) || empty($appId)) {
+            return null;
+        }
+
+        // Create token payload
+        $payload = [
+            'iss' => $appId,
+            'aud' => $appId,
+            'sub' => $this->getJitsiDomain(),
+            'exp' => time() + 3600, // Token expires in 1 hour
+            'room' => $roomName,
+            'context' => [
+                'user' => [
+                    'id' => $userId,
+                    'name' => $userName,
+                    'email' => $userEmail,
+                    'moderator' => true
+                ]
+            ]
+        ];
+
+        // Generate JWT token
+        try {
+            return \Firebase\JWT\JWT::encode($payload, $key, 'HS256');
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate Jitsi JWT: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Get the configuration for a Jitsi meeting
      *
      * @param string $meetingId
@@ -44,6 +93,20 @@ class JitsiService
             'roomName' => $meetingId,
             'displayName' => $displayName,
         ];
+
+        // Add JWT token if user info is provided
+        if (isset($options['userId']) && isset($options['email'])) {
+            $jwt = $this->generateJWT(
+                $options['userId'],
+                $displayName,
+                $options['email'],
+                $meetingId
+            );
+
+            if ($jwt) {
+                $config['jwt'] = $jwt;
+            }
+        }
 
         // Add additional options
         if (!empty($options)) {

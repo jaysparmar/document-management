@@ -33,6 +33,11 @@ return [
 
     'jitsi' => [
         'domain' => env('JITSI_DOMAIN', 'meet.jit.si'),
+        'jwt' => [
+            'enabled' => env('JITSI_JWT_ENABLED', true),
+            'app_id' => env('JITSI_JWT_APP_ID', 'document_management_app'),
+            'key' => env('JITSI_JWT_KEY', 'document_management_secure_key'),
+        ],
     ],
 
 ];

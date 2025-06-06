@@ -237,6 +237,7 @@ class MeetingController extends Controller
             $meeting->title,
             $displayName,
             [
+                'userId' => $user->id,
                 'email' => $user->email,
                 'startTime' => $meeting->start_time,
                 'endTime' => $meeting->end_time
