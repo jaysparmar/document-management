@@ -103,8 +103,18 @@ Route::match(['get', 'post'], '/chatify/auth', function () {
     ->middleware(['auth.jwt'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
+// Test routes for Pusher
+Route::get('/test-pusher', function () {
+    event(new \App\Events\PusherTestEvent('Test message from Laravel at ' . now()));
+    return 'Event dispatched! Check your browser console.';
+});
+
+Route::get('/pusher-test', function () {
+    return view('pusher-test');
+});
+
 Route::any('/{any}', [AngularController::class, 'index'])
-    ->where('any', '^(?!(api|install|update|chatify)).*$');
+    ->where('any', '^(?!(api|install|update|chatify|test-pusher|pusher-test)).*$');
 // Route::get('/category', [CategoryController::class, 'index']);
 // Route::get('/category',function(){
 // });
