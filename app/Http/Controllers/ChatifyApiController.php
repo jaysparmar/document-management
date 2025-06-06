@@ -46,6 +46,12 @@ class ChatifyApiController extends Controller
             $q->where('from_id', $userId)->where('to_id', $authId);
         })->orderBy('created_at', 'asc')->get();
 
+        // Add isMine flag to each message to help frontend determine message position
+        $messages = $messages->map(function ($message) use ($authId) {
+            $message->isMine = $message->from_id === $authId;
+            return $message;
+        });
+
         return response()->json([
             'messages' => $messages,
         ]);
