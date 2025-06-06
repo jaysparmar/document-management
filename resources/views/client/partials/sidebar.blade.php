@@ -30,7 +30,7 @@
                 </a>
             </li>
 
-            {{-- Upload Document --}}
+            {{-- Upload Document
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ Request::is('client-portal/documents/create') ? 'active' : '' }}"
                    href="{{ route('client-portal.documents.create') }}">
@@ -39,7 +39,7 @@
                     </div>
                     <span class="nav-link-text">Upload Document</span>
                 </a>
-            </li>
+            </li> --}}
 
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account</h6>

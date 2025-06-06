@@ -42,6 +42,7 @@ class HomeController extends Controller
         $lastMonthDocuments = Documents::where('clientId', $client->id)
             ->where('createdDate', '>=', now()->subMonth())
             ->count();
+
         $documentStats['lastMonthCount'] = $lastMonthDocuments;
         // Get Last Year's Documents Count
         $lastYearDocuments = Documents::where('clientId', $client->id)

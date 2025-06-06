@@ -111,6 +111,9 @@ class ClientHelper
                   ->orWhere('description', 'like', "%{$filters['search']}%");
             });
         }
+        if (isset($filters['limit'])) {
+            $query->limit($filters['limit']);
+        }
 
         return $query->latest('createdDate')->get();
     }

@@ -1,5 +1,6 @@
 @php
     use App\Helpers\ClientHelper;
+    $client = ClientHelper::getAuthClient();
 @endphp
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur">
     <div class="container-fluid py-1 px-3">
@@ -10,29 +11,54 @@
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
             <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
             <ul class="navbar-nav justify-content-end">
-                <li class="nav-item dropdown pe-3">
-                    <a class="nav-link d-flex align-items-center cursor-pointer" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+
+                <!-- Profile Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/client/img/avatar.png') }}" class="avatar avatar-sm me-2" alt="avatar">
-                            <span class="d-none d-md-inline-block">{{ ClientHelper::getAuthClient()->companyName }}</span>
+                            <div class="icon icon-shape bg-gradient-primary shadow icon-sm rounded-circle text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="fa fa-user text-white"></i>
+                            </div>
+                            <span class="d-none d-md-inline-block font-weight-bold">{{ $client->companyName }}</span>
                         </div>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="profileDropdown">
-                        <li class="mb-2">
-                            <a class="dropdown-item border-radius-md" href="{{ '#client-profile' }}">
-                                <div class="d-flex align-items-center py-1">
-                                    <i class="ni ni-single-02 text-sm me-2"></i>
-                                    <span class="text-sm">{{ __('Profile') }}</span>
+                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4">
+                        <li>
+                            <div class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon icon-shape bg-gradient-primary shadow icon-sm rounded-circle text-center me-2">
+                                        <i class="fa fa-user text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm mb-0">{{ $client->companyName }}</div>
+                                        <div class="text-xs text-secondary mb-0">{{ $client->email }}</div>
+                                    </div>
                                 </div>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('client-portal.documents.index') }}">
+                                <i class="fa fa-folder me-2"></i>
+                                <span class="text-sm">My Documents</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item border-radius-md" href="{{ '#client-portal.logout' }}">
-                                <div class="d-flex align-items-center py-1">
-                                    <i class="ni ni-button-power text-sm me-2"></i>
-                                    <span class="text-sm">{{ __('Logout') }}</span>
-                                </div>
+                            <a class="dropdown-item" href="{{ route('client-portal.profile.index') }}">
+                                <i class="fa fa-user me-2"></i>
+                                <span class="text-sm">Profile Settings</span>
                             </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{{ route('client-portal.logout') }}" id="logout-form">
+                                @csrf
+                                <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="fa fa-power-off text-danger me-2"></i>
+                                    <span class="text-sm">Logout</span>
+                                </a>
+                            </form>
                         </li>
                     </ul>
                 </li>

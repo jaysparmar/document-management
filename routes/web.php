@@ -29,15 +29,26 @@ Route::prefix('client-portal')->group(function () {
         return view('client.auth.login');
     })->name('client-portal.login');
     Route::post('/authenticate', [AuthController::class, 'authenticate'])->name('client-portal.authenticate');
+    Route::post('/logout', [App\Http\Controllers\Client\AuthController::class, 'logout'])
+        ->name('logout')
+        ->middleware('auth:client');
 });
 
 // ✅ Protect only authenticated client routes
-Route::prefix('client-portal')->name('client-portal.')->middleware('auth:client')->group(function () {
+Route::prefix('client-portal')->name('client-portal.')->middleware(['auth:client'])->group(function () {
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::resource('documents', DocumentController::class);
-    Route::resource('profile', ProfileController::class);
+    Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::get('profile/stats', [ProfileController::class, 'getStats'])->name('profile.stats');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('documents/view-document', [DocumentController::class, 'viewDocument'])->name('documents.view');
+    // routes/web.php or routes/client.php
+    Route::get('documents/stream/{uuid}', [DocumentController::class, 'streamDocument'])
+        ->name('documents.stream');
 });
 
 
@@ -104,7 +115,8 @@ Route::match(['get', 'post'], '/chatify/auth', function () {
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::any('/{any}', [AngularController::class, 'index'])
-    ->where('any', '^(?!(api|install|update|chatify)).*$');
+    ->where('any', '^(?!(api|install|update|chatify|storage|public|client-portal)).*$');
+
 // Route::get('/category', [CategoryController::class, 'index']);
 // Route::get('/category',function(){
 // });

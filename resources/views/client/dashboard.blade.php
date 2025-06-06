@@ -74,7 +74,7 @@
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">Last 30 Days</p>
-                                <h5 class="font-weight-bolder mb-0>
+                                <h5 class="font-weight-bolder mb-0">
                                     {{ $documentStats['lastMonthCount'] }}
                                     <span class="text-warning text-sm font-weight-bolder">Documents</span>
                                 </h5>
@@ -154,7 +154,7 @@
                                         <span class="text-xs font-weight-bold">{{ $document->categories->name }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge badge-sm bg-gradient-{{ $document->docuementStatus->color }}">
+                                        <span class="badge badge-sm" style="background-color: {{ $document->docuementStatus->colorCode }}">
                                             {{ $document->docuementStatus->name }}
                                         </span>
                                     </td>
