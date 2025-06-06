@@ -169,6 +169,7 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
   }
 
   isOwnMessage(message: any): boolean {
-    return message.from_id === this.currentUser.id;
+    // Use the isMine flag if available, otherwise fall back to comparing IDs
+    return message.isMine !== undefined ? message.isMine : message.from_id === this.currentUser.id;
   }
 }

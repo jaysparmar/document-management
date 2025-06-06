@@ -53,3 +53,32 @@ Broadcast::channel('presence-activeStatus', function ($user) {
     \Illuminate\Support\Facades\Log::warning('Invalid user object for presence-activeStatus channel');
     return false;
 });
+
+// Add support for the 'activeStatus' channel without the 'presence-' prefix
+Broadcast::channel('activeStatus', function ($user) {
+    // Log the user object for debugging
+    \Illuminate\Support\Facades\Log::info('activeStatus callback', [
+        'user' => $user ? get_class($user) : 'null',
+        'user_id' => $user ? ($user->id ?? 'not set') : 'null',
+        'firstName' => $user ? ($user->firstName ?? 'not set') : 'null',
+        'lastName' => $user ? ($user->lastName ?? 'not set') : 'null'
+    ]);
+
+    // Always allow access to this channel
+    return true;
+});
+
+// Add support for 'chatify.*' channels
+Broadcast::channel('chatify.{id}', function ($user, $id) {
+    // Log the user object for debugging
+    \Illuminate\Support\Facades\Log::info('chatify.{id} callback', [
+        'user' => $user ? get_class($user) : 'null',
+        'user_id' => $user ? ($user->id ?? 'not set') : 'null',
+        'channel_id' => $id,
+        'firstName' => $user ? ($user->firstName ?? 'not set') : 'null',
+        'lastName' => $user ? ($user->lastName ?? 'not set') : 'null'
+    ]);
+
+    // Always allow access to this channel
+    return true;
+});
