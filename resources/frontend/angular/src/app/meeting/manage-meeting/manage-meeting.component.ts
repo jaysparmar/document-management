@@ -105,4 +105,21 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
   cancel() {
     this.router.navigate(['/meetings']);
   }
+
+  deleteMeeting() {
+    if (this.isEditMode && confirm(this.translateService.instant('ARE_YOU_SURE_YOU_WANT_TO_DELETE'))) {
+      this.loading = true;
+      this.sub$.sink = this.meetingService.deleteMeeting(this.meetingId)
+        .subscribe(
+          () => {
+            this.toastrService.success(this.translateService.instant('MEETING_DELETED_SUCCESSFULLY'));
+            this.router.navigate(['/meetings']);
+            this.loading = false;
+          },
+          () => {
+            this.loading = false;
+          }
+        );
+    }
+  }
 }
