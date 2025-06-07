@@ -241,6 +241,18 @@
   width: 16px;
 }
 
+.image-preview {
+  margin-top: 8px;
+  max-width: 100%;
+}
+
+.attachment-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .message-input-container {
   padding: 16px;
   border-top: 1px solid #e0e0e0;

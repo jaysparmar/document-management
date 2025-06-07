@@ -172,4 +172,11 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
     // Use the isMine flag if available, otherwise fall back to comparing IDs
     return message.isMine !== undefined ? message.isMine : message.from_id === this.currentUser.id;
   }
+
+  isImage(filename: string): boolean {
+    if (!filename) return false;
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    const extension = filename.split('.').pop()?.toLowerCase();
+    return extension ? imageExtensions.includes(extension) : false;
+  }
 }

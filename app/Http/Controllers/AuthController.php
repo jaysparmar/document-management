@@ -19,6 +19,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         $credentials = $request->only('email', 'password');
         $token = Auth::claims([])->attempt($credentials);
         $remoteIP = $this->getIp();

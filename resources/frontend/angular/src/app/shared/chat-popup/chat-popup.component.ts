@@ -184,6 +184,12 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
     return message.isMine !== undefined ? message.isMine : message.from_id === this.currentUser.id;
   }
 
+  isImage(filename: string): boolean {
+    if (!filename) return false;
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    const extension = filename.split('.').pop()?.toLowerCase();
+    return extension ? imageExtensions.includes(extension) : false;
+  }
 
   closeDialog(): void {
     this.dialogRef.close();
