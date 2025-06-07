@@ -42,14 +42,14 @@ export class FloatingChatButtonComponent implements OnInit, OnDestroy {
   openChat(): void {
     if (this.dialogRef) {
       // If dialog is already open, focus it
-      this.dialogRef.componentInstance.isMinimized = false;
+      // No need to do anything, dialog is already open
     } else {
       // Open new dialog
       this.dialogRef = this.dialog.open(ChatPopupComponent, {
         width: '800px',
         height: '600px',
         panelClass: 'chat-popup-dialog',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false,
         position: {
           bottom: '30px',

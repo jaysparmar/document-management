@@ -1,11 +1,8 @@
-<div class="chat-popup-container" [class.minimized]="isMinimized">
+<div class="chat-popup-container">
   <!-- Header with controls -->
   <div class="popup-header">
     <div class="popup-title">{{ 'CHAT' | translate }}</div>
     <div class="popup-controls">
-      <button mat-icon-button (click)="toggleMinimize()">
-        <mat-icon>{{ isMinimized ? 'maximize' : 'minimize' }}</mat-icon>
-      </button>
       <button mat-icon-button (click)="closeDialog()">
         <mat-icon>close</mat-icon>
       </button>
@@ -13,7 +10,7 @@
   </div>
 
   <!-- Main content -->
-  <div class="popup-content" *ngIf="!isMinimized">
+  <div class="popup-content">
     <mat-sidenav-container class="popup-sidenav-container">
       <!-- Contacts sidebar -->
       <mat-sidenav mode="side" opened class="popup-contacts-sidebar">

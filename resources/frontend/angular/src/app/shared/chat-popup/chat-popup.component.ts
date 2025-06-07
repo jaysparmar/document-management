@@ -19,7 +19,6 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
   loading = false;
   searchQuery = '';
   currentUser: any;
-  isMinimized = false;
 
   constructor(
     private chatifyService: ChatifyService,
@@ -185,9 +184,6 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
     return message.isMine !== undefined ? message.isMine : message.from_id === this.currentUser.id;
   }
 
-  toggleMinimize(): void {
-    this.isMinimized = !this.isMinimized;
-  }
 
   closeDialog(): void {
     this.dialogRef.close();
