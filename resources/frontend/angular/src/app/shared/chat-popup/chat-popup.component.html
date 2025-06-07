@@ -1,0 +1,140 @@
+<div class="chat-popup-container" [class.minimized]="isMinimized">
+  <!-- Header with controls -->
+  <div class="popup-header">
+    <div class="popup-title">{{ 'CHAT' | translate }}</div>
+    <div class="popup-controls">
+      <button mat-icon-button (click)="toggleMinimize()">
+        <mat-icon>{{ isMinimized ? 'maximize' : 'minimize' }}</mat-icon>
+      </button>
+      <button mat-icon-button (click)="closeDialog()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="popup-content" *ngIf="!isMinimized">
+    <mat-sidenav-container class="popup-sidenav-container">
+      <!-- Contacts sidebar -->
+      <mat-sidenav mode="side" opened class="popup-contacts-sidebar">
+        <div class="search-container">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>{{ 'SEARCH_USERS' | translate }}</mat-label>
+            <input matInput [(ngModel)]="searchQuery" (keyup.enter)="searchUsers()">
+            <button mat-icon-button matSuffix (click)="searchUsers()">
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div class="contacts-list">
+          <mat-list>
+            <mat-list-item *ngFor="let contact of contacts"
+                           [class.selected]="selectedUser && selectedUser.id === contact.id"
+                           (click)="selectUser(contact)">
+              <img matListAvatar [src]="contact.avatar || 'assets/images/user.jpg'" [alt]="contact.name">
+              <div matLine class="contact-name">{{ contact.name }}</div>
+              <div matLine class="contact-status" *ngIf="contact.active_status">
+                <span class="status-indicator online"></span>
+                {{ 'ONLINE' | translate }}
+              </div>
+              <div matLine class="contact-status" *ngIf="!contact.active_status">
+                <span class="status-indicator offline"></span>
+                {{ 'OFFLINE' | translate }}
+              </div>
+            </mat-list-item>
+          </mat-list>
+
+          <div *ngIf="loading" class="loading-spinner">
+            <mat-spinner diameter="30"></mat-spinner>
+          </div>
+
+          <div *ngIf="!loading && contacts.length === 0" class="no-contacts">
+            {{ 'NO_CONTACTS_FOUND' | translate }}
+          </div>
+        </div>
+      </mat-sidenav>
+
+      <!-- Chat content -->
+      <mat-sidenav-content class="popup-chat-content">
+        <div *ngIf="!selectedUser" class="no-chat-selected">
+          <mat-icon class="medium-icon">chat</mat-icon>
+          <h3>{{ 'SELECT_CHAT' | translate }}</h3>
+          <p>{{ 'SELECT_USER_TO_START_CHAT' | translate }}</p>
+        </div>
+
+        <div *ngIf="selectedUser" class="chat-container">
+          <!-- Chat header -->
+          <div class="chat-header">
+            <div class="user-info">
+              <img [src]="selectedUser.avatar || 'assets/images/user.jpg'" [alt]="selectedUser.name" class="avatar">
+              <div class="user-details">
+                <h3>{{ selectedUser.name }}</h3>
+                <div class="status" *ngIf="selectedUser.active_status">
+                  <span class="status-indicator online"></span>
+                  {{ 'ONLINE' | translate }}
+                </div>
+                <div class="status" *ngIf="!selectedUser.active_status">
+                  <span class="status-indicator offline"></span>
+                  {{ 'OFFLINE' | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div class="popup-messages-container">
+            <div *ngIf="loading" class="loading-spinner">
+              <mat-spinner diameter="30"></mat-spinner>
+            </div>
+
+            <div *ngIf="!loading && messages.length === 0" class="no-messages">
+              {{ 'NO_MESSAGES_YET' | translate }}
+            </div>
+
+            <div *ngFor="let message of messages"
+                 [ngClass]="{'message': true, 'own-message': isOwnMessage(message), 'other-message': !isOwnMessage(message)}">
+              <div class="message-content">
+                <div class="message-text" [innerHTML]="message.body"></div>
+                <div class="message-time">{{ message.created_at | date:'short' }}</div>
+              </div>
+              <div *ngIf="message.attachment" class="message-attachment">
+                <a [href]="message.attachment.url" target="_blank" class="attachment-link">
+                  <mat-icon>attachment</mat-icon>
+                  {{ message.attachment.name }}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message input -->
+          <div class="message-input-container">
+            <form [formGroup]="messageForm" (ngSubmit)="sendMessage()">
+              <div class="input-row">
+                <mat-form-field appearance="outline" class="message-field">
+                  <mat-label>{{ 'TYPE_MESSAGE' | translate }}</mat-label>
+                  <input matInput formControlName="message">
+                </mat-form-field>
+
+                <button type="button" mat-icon-button (click)="fileInput.click()" matTooltip="{{ 'ATTACH_FILE' | translate }}">
+                  <mat-icon>attach_file</mat-icon>
+                </button>
+                <input hidden type="file" #fileInput (change)="onFileSelected($event)">
+
+                <button type="submit" mat-raised-button color="primary" [disabled]="messageForm.invalid || loading">
+                  <mat-icon>send</mat-icon>
+                </button>
+              </div>
+              <div *ngIf="messageForm.get('attachment').value" class="attachment-preview">
+                <span>{{ messageForm.get('attachment').value.name }}</span>
+                <button type="button" mat-icon-button (click)="messageForm.patchValue({attachment: null})">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

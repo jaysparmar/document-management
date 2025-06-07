@@ -26,6 +26,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FloatingChatButtonComponent } from './floating-chat-button/floating-chat-button.component';
+import { ChatPopupComponent } from './chat-popup/chat-popup.component';
 @NgModule({
   declarations: [
     HasClaimDirective,
@@ -41,6 +47,8 @@ import { MatButtonModule } from '@angular/material/button';
     DocumentLinkPreviewPasswordComponent,
     PageHelpPreviewComponent,
     PageHelpTextComponent,
+    FloatingChatButtonComponent,
+    ChatPopupComponent,
   ],
   imports: [
     CommonModule,
@@ -52,10 +60,15 @@ import { MatButtonModule } from '@angular/material/button';
     PipesModule,
     TranslateModule,
     FeatherIconsModule,
+    MaterialModule,
     MatIconModule,
     MatDialogModule,
     CKEditorModule,
     MatButtonModule,
+    MatTooltipModule,
+    MatSidenavModule,
+    MatListModule,
+    MatProgressSpinnerModule,
   ],
   exports: [
     CommonModule,
@@ -74,6 +87,8 @@ import { MatButtonModule } from '@angular/material/button';
     TranslateModule,
     PipesModule,
     PageHelpTextComponent,
+    FloatingChatButtonComponent,
+    ChatPopupComponent,
   ],
 })
 export class SharedModule {}
