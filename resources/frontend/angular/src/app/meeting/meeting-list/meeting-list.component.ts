@@ -74,4 +74,16 @@ export class MeetingListComponent extends BaseComponent implements OnInit {
   joinMeeting(meeting: Meeting): void {
     this.router.navigate([`/meetings/join/${meeting.id}`]);
   }
+
+  copyMeetingLink(meeting: Meeting): void {
+    const url = window.location.origin + `/meetings/join/${meeting.id}`;
+    navigator.clipboard.writeText(url).then(
+      () => {
+        this.toastrService.success(this.translateService.instant('MEETING_LINK_COPIED_SUCCESSFULLY'));
+      },
+      () => {
+        this.toastrService.error(this.translateService.instant('FAILED_TO_COPY_MEETING_LINK'));
+      }
+    );
+  }
 }

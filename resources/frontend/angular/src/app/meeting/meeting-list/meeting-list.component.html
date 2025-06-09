@@ -44,11 +44,15 @@
                 <td>{{meeting.endTime | date:'medium'}}</td>
                 <td>{{meeting.creator?.firstName}} {{meeting.creator?.lastName}}</td>
                 <td>
-                  <button class="btn btn-sm btn-primary mr-2" (click)="joinMeeting(meeting)">
+                  <button class="btn btn-sm btn-primary me-2" (click)="joinMeeting(meeting)">
                     <i class="fas fa-video"></i> {{'JOIN' | translate}}
                   </button>
 
-                  <button *ngIf="meeting.createdBy === currentUserId" class="btn btn-sm btn-info mr-2" (click)="editMeeting(meeting)">
+                  <button class="btn btn-sm btn-secondary me-2" (click)="copyMeetingLink(meeting)">
+                    <i class="fas fa-copy"></i> {{'COPY_LINK' | translate}}
+                  </button>
+
+                  <button *ngIf="meeting.createdBy === currentUserId" class="btn btn-sm btn-info me-2" (click)="editMeeting(meeting)">
                     <i class="fas fa-edit"></i> {{'EDIT' | translate}}
                   </button>
                   <button *ngIf="meeting.createdBy === currentUserId" class="btn btn-sm btn-danger" (click)="deleteMeeting(meeting)">
