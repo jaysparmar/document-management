@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AngularController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\HomeController;
@@ -122,6 +123,28 @@ Route::get('/test-pusher', function () {
 
 Route::get('/pusher-test', function () {
     return view('pusher-test');
+});
+
+// Route to delete existing storage link and create a new one
+Route::get('/storage-link', function () {
+    try {
+        // Delete existing storage link if it exists
+        $publicStoragePath = public_path('storage');
+        if (file_exists($publicStoragePath)) {
+            if (is_link($publicStoragePath)) {
+                unlink($publicStoragePath);
+            } else {
+                // If it's a directory and not a symlink, remove it recursively
+                \Illuminate\Support\Facades\File::deleteDirectory($publicStoragePath);
+            }
+        }
+
+        // Create new storage link
+        Artisan::call('storage:link');
+        return response()->json(['message' => 'Existing storage link deleted and new one created successfully.']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 Route::any('/{any}', [AngularController::class, 'index'])

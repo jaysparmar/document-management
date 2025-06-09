@@ -50,9 +50,16 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
 
   getUsers(): void {
     this.loading = true;
+    const currentUser = this.securityService.getUserDetail();
+
     this.sub$.sink = this.commonService.getUsers().subscribe(
       (data: User[]) => {
-        this.users = data;
+        // Filter out the current user from the participants list
+        if (currentUser && currentUser.user && currentUser.user.id) {
+          this.users = data.filter(user => user.id !== currentUser.user.id);
+        } else {
+          this.users = data;
+        }
         this.loading = false;
       },
       (error) => {

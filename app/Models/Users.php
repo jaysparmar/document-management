@@ -69,6 +69,7 @@ class Users extends Authenticatable implements JWTSubject
     public function meetings()
     {
         return $this->belongsToMany(Meeting::class, 'meeting_user', 'user_id', 'meeting_id')
+                    ->using(MeetingUser::class)
                     ->withPivot('is_accepted')
                     ->withTimestamps();
     }

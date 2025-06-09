@@ -18,6 +18,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedModule } from '@shared/shared.module';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { SharedModule } from '@shared/shared.module';
     MatTableModule,
     MatTooltipModule,
     TranslateModule,
-    SharedModule
+    SharedModule,
+    NgSelectModule
   ]
 })
 export class MeetingModule { }

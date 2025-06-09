@@ -1,1 +1,59 @@
 /* Styles for the manage meeting component */
+
+/* Styles for ng-select */
+::ng-deep .ng-select {
+  .ng-select-container {
+    min-height: 38px;
+    border-radius: 0.25rem;
+  }
+
+  &.ng-select-multiple {
+    .ng-value-container {
+      padding-top: 5px;
+      padding-left: 10px;
+
+      .ng-value {
+        margin-right: 5px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        padding: 2px 8px;
+        display: flex;
+        align-items: center;
+
+        .ng-value-label {
+          margin-right: 5px;
+        }
+
+        .ng-value-icon {
+          cursor: pointer;
+          font-weight: bold;
+
+          &:hover {
+            color: #dc3545;
+          }
+        }
+      }
+
+      .ng-placeholder {
+        top: 8px;
+      }
+    }
+  }
+
+  .ng-dropdown-panel {
+    .ng-dropdown-panel-items {
+      .ng-option {
+        padding: 8px 10px;
+
+        &.ng-option-selected {
+          background-color: #e6f7ff;
+          color: #333;
+        }
+
+        &.ng-option-marked {
+          background-color: #f5f5f5;
+        }
+      }
+    }
+  }
+}

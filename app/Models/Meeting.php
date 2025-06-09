@@ -44,6 +44,7 @@ class Meeting extends Model
     public function users()
     {
         return $this->belongsToMany(Users::class, 'meeting_user', 'meeting_id', 'user_id')
+                    ->using(MeetingUser::class)
                     ->withPivot('is_accepted')
                     ->withTimestamps();
     }

@@ -3,6 +3,7 @@
 namespace App\Repositories\Implementation;
 
 use App\Models\Meeting;
+use App\Models\MeetingUser;
 use App\Models\Users;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Implementation\BaseRepository;
@@ -50,7 +51,16 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
             // Add users to the meeting
             if (isset($attributes['user_ids']) && is_array($attributes['user_ids'])) {
                 foreach ($attributes['user_ids'] as $userId) {
-                    $model->users()->attach($userId);
+                    // Check if user is already in the meeting
+                    if (!$model->users()->where('user_id', $userId)->exists()) {
+                        // Create a new MeetingUser instance with UUID
+                        $meetingUser = new MeetingUser();
+                        $meetingUser->id = Uuid::uuid4()->toString();
+                        $meetingUser->meeting_id = $model->id;
+                        $meetingUser->user_id = $userId;
+                        $meetingUser->is_accepted = false;
+                        $meetingUser->save();
+                    }
                 }
             }
 
@@ -85,8 +95,26 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
             if (is_array($userIds)) {
                 $meeting = Meeting::findOrFail($id);
 
-                // Sync users (this will remove users not in the array and add new ones)
-                $meeting->users()->sync($userIds);
+                // First, remove users that are not in the array
+                $existingUserIds = $meeting->users()->pluck('user_id')->toArray();
+                $userIdsToRemove = array_diff($existingUserIds, $userIds);
+
+                foreach ($userIdsToRemove as $userId) {
+                    $meeting->users()->detach($userId);
+                }
+
+                // Then, add new users with UUID
+                foreach ($userIds as $userId) {
+                    if (!$meeting->users()->where('user_id', $userId)->exists()) {
+                        // Create a new MeetingUser instance with UUID
+                        $meetingUser = new MeetingUser();
+                        $meetingUser->id = Uuid::uuid4()->toString();
+                        $meetingUser->meeting_id = $meeting->id;
+                        $meetingUser->user_id = $userId;
+                        $meetingUser->is_accepted = false;
+                        $meetingUser->save();
+                    }
+                }
             }
 
             DB::commit();
@@ -107,7 +135,13 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
             foreach ($userIds as $userId) {
                 // Check if user is already in the meeting
                 if (!$meeting->users()->where('user_id', $userId)->exists()) {
-                    $meeting->users()->attach($userId);
+                    // Create a new MeetingUser instance with UUID
+                    $meetingUser = new MeetingUser();
+                    $meetingUser->id = Uuid::uuid4()->toString();
+                    $meetingUser->meeting_id = $meeting->id;
+                    $meetingUser->user_id = $userId;
+                    $meetingUser->is_accepted = false;
+                    $meetingUser->save();
                 }
             }
 
