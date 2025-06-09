@@ -4,6 +4,7 @@ import { AuthGuard } from '@core/security/auth.guard';
 import { DocumentListComponent } from './document-list/document-list.component';
 import { DocumentManageComponent } from './document-manage/document-manage.component';
 import { DocumentDeepSearchComponent } from './document-deep-search/document-deep-search.component';
+import { DocumentAttachmentsComponent } from './document-attachments/document-attachments.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,12 @@ const routes: Routes = [
     path: 'add',
     component: DocumentManageComponent,
     data: { claimType: 'ALL_DOCUMENTS_CREATE_DOCUMENT' },
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'attachments/:id',
+    component: DocumentAttachmentsComponent,
+    data: { claimType: 'ALL_DOCUMENTS_VIEW_DOCUMENTS' },
     canActivate: [AuthGuard],
   },
   {

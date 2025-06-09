@@ -72,6 +72,7 @@ export class DocumentListComponent
     'statusName',
     'createdDate',
     'createdBy',
+    'attachments',
   ];
   footerToDisplayed = ['footer'];
   documentResource: DocumentResource;

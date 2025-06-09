@@ -35,6 +35,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { SharableLinkComponent } from './sharable-link/sharable-link.component';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { DocumentDeepSearchComponent } from './document-deep-search/document-deep-search.component';
+import { DocumentAttachmentsComponent } from './document-attachments/document-attachments.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { DocumentDeepSearchComponent } from './document-deep-search/document-dee
     DocumentVersionHistoryComponent,
     SharableLinkComponent,
     DocumentDeepSearchComponent,
+    DocumentAttachmentsComponent,
   ],
   imports: [
     CommonModule,

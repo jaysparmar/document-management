@@ -1,0 +1,76 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row align-items-center">
+          <div class="col">
+            <span class="page-title">{{ "DOCUMENT_ATTACHMENTS" | translate }}
+              <app-page-help-text code="DOCUMENT_ATTACHMENTS"></app-page-help-text>
+            </span>
+          </div>
+          <div class="col-auto">
+            <ul class="breadcrumb-list">
+              <li class="breadcrumb-item bcrumb-1">
+                <button class="btn btn-secondary btn-sm" (click)="goBack()">
+                  <i-feather name="arrow-left" class="btn-secondary small-icon"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'BACK' | translate}}</span>
+                </button>
+              </li>
+              <li class="breadcrumb-item bcrumb-1">
+                <button class="btn btn-info btn-sm" (click)="goToDocumentDetails()">
+                  <i-feather name="info" class="btn-info small-icon"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'DOCUMENT_DETAILS' | translate}}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>{{ document?.name }}</h2>
+          </div>
+          <div class="body">
+            <div *ngIf="loading" class="text-center p-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">{{'LOADING' | translate}}</span>
+              </div>
+            </div>
+            <div *ngIf="!loading">
+              <div *ngIf="attachments.length === 0" class="text-center p-5">
+                <p>{{'NO_ATTACHMENTS_FOUND' | translate}}</p>
+              </div>
+              <div *ngIf="attachments.length > 0" class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>{{'NAME' | translate}}</th>
+                      <th>{{'FILE_TYPE' | translate}}</th>
+                      <th>{{'ACTIONS' | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let attachment of attachments">
+                      <td>{{ attachment.name }}</td>
+                      <td>{{ attachment.extension }}</td>
+                      <td>
+                        <button class="btn btn-primary btn-sm me-2" (click)="downloadAttachment(attachment)">
+                          <i-feather name="download" class="btn-primary small-icon"></i-feather>
+                          <span class="d-none d-sm-inline"> {{'DOWNLOAD' | translate}}</span>
+                        </button>
+                        <button (click)="log(document)"></button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
