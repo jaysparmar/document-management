@@ -4,7 +4,7 @@ import { CommonHttpErrorService } from '@core/error-handler/common-http-error.se
 import { Meeting, JitsiConfig } from '@core/domain-classes/meeting';
 import { Observable } from 'rxjs';
 import { CommonError } from '@core/error-handler/common-error';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class MeetingService {
@@ -13,34 +13,105 @@ export class MeetingService {
     private httpClient: HttpClient,
     private commonHttpErrorService: CommonHttpErrorService) { }
 
+  // Convert snake_case keys to camelCase
+  private toCamelCase(data: any): any {
+    if (Array.isArray(data)) {
+      return data.map(item => this.toCamelCase(item));
+    }
+
+    if (data !== null && typeof data === 'object') {
+      const newObj = {};
+
+      Object.keys(data).forEach(key => {
+        // Convert key from snake_case to camelCase
+        const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+
+        // Recursively convert nested objects
+        newObj[camelKey] = this.toCamelCase(data[key]);
+
+        // For backward compatibility, keep original snake_case keys for specific properties
+        if (key === 'start_time' || key === 'end_time' || key === 'jitsi_meeting_id') {
+          newObj[key] = data[key];
+        }
+      });
+
+      return newObj;
+    }
+
+    return data;
+  }
+
+  // Convert camelCase keys to snake_case for API requests
+  private toSnakeCase(data: any): any {
+    if (Array.isArray(data)) {
+      return data.map(item => this.toSnakeCase(item));
+    }
+
+    if (data !== null && typeof data === 'object') {
+      const newObj = {};
+
+      Object.keys(data).forEach(key => {
+        // Skip backward compatibility properties
+        if (key === 'start_time' || key === 'end_time' || key === 'jitsi_meeting_id') {
+          return;
+        }
+
+        // Convert key from camelCase to snake_case
+        const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+
+        // Recursively convert nested objects
+        newObj[snakeKey] = this.toSnakeCase(data[key]);
+      });
+
+      return newObj;
+    }
+
+    return data;
+  }
+
   getAllMeetings(): Observable<Meeting[] | CommonError> {
     const url = `meetings`;
-    return this.httpClient.get<Meeting[]>(url)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    return this.httpClient.get<any[]>(url)
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting[]),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   getMyMeetings(): Observable<any | CommonError> {
     const url = `meetings/my`;
     return this.httpClient.get<any>(url)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+      .pipe(
+        map(data => this.toCamelCase(data)),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   getMeeting(id: string): Observable<Meeting | CommonError> {
     const url = `meetings/${id}`;
-    return this.httpClient.get<Meeting>(url)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    return this.httpClient.get<any>(url)
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   createMeeting(meeting: Meeting): Observable<Meeting | CommonError> {
     const url = `meetings`;
-    return this.httpClient.post<Meeting>(url, meeting)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    return this.httpClient.post<any>(url, this.toSnakeCase(meeting))
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   updateMeeting(meeting: Meeting): Observable<Meeting | CommonError> {
     const url = `meetings/${meeting.id}`;
-    return this.httpClient.put<Meeting>(url, meeting)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    return this.httpClient.put<any>(url, this.toSnakeCase(meeting))
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   deleteMeeting(id: string): Observable<void | CommonError> {
@@ -51,25 +122,38 @@ export class MeetingService {
 
   addUsersToMeeting(meetingId: string, userIds: string[]): Observable<Meeting | CommonError> {
     const url = `meetings/${meetingId}/users`;
-    return this.httpClient.post<Meeting>(url, { user_ids: userIds })
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    // Keep using snake_case for API request
+    return this.httpClient.post<any>(url, { user_ids: userIds })
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   removeUserFromMeeting(meetingId: string, userId: string): Observable<Meeting | CommonError> {
     const url = `meetings/${meetingId}/users/${userId}`;
-    return this.httpClient.delete<Meeting>(url)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    return this.httpClient.delete<any>(url)
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   acceptMeetingInvitation(meetingId: string): Observable<Meeting | CommonError> {
     const url = `meetings/${meetingId}/accept`;
-    return this.httpClient.post<Meeting>(url, {})
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+    return this.httpClient.post<any>(url, {})
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 
   getJitsiInfo(meetingId: string): Observable<any | CommonError> {
     const url = `meetings/${meetingId}/jitsi`;
     return this.httpClient.get<any>(url)
-      .pipe(catchError(this.commonHttpErrorService.handleError));
+      .pipe(
+        map(data => this.toCamelCase(data)),
+        catchError(this.commonHttpErrorService.handleError)
+      );
   }
 }

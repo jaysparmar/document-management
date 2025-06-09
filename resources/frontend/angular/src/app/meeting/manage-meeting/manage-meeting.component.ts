@@ -66,9 +66,9 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
     this.meetingForm = this.fb.group({
       title: ['', [Validators.required]],
       description: [''],
-      start_time: ['', [Validators.required]],
-      end_time: ['', [Validators.required]],
-      user_ids: [[]]
+      startTime: ['', [Validators.required]],
+      endTime: ['', [Validators.required]],
+      userIds: [[]]
     });
   }
 
@@ -82,7 +82,7 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
           // Set selected users if available
           if (meeting.users && meeting.users.length > 0) {
             const userIds = meeting.users.map(user => user.id);
-            this.meetingForm.get('user_ids').setValue(userIds);
+            this.meetingForm.get('userIds').setValue(userIds);
           }
 
           // Generate meeting link

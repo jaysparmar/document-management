@@ -40,8 +40,8 @@
               <tr *ngFor="let meeting of meetings">
                 <td>{{meeting.title}}</td>
                 <td>{{meeting.description}}</td>
-                <td>{{meeting.start_time | date:'medium'}}</td>
-                <td>{{meeting.end_time | date:'medium'}}</td>
+                <td>{{meeting.startTime | date:'medium'}}</td>
+                <td>{{meeting.endTime | date:'medium'}}</td>
                 <td>{{meeting.creator?.firstName}} {{meeting.creator?.lastName}}</td>
                 <td>
                   <button class="btn btn-sm btn-primary mr-2" (click)="joinMeeting(meeting)">

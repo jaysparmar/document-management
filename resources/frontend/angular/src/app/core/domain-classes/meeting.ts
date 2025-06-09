@@ -2,21 +2,31 @@ export interface Meeting {
     id?: string;
     title: string;
     description?: string;
-    start_time: Date;
-    end_time: Date;
-    jitsi_meeting_id?: string;
+    startTime: Date;
+    endTime: Date;
+    jitsiMeetingId?: string;
     createdBy?: string;
     isDeleted?: boolean;
     creator?: any;
     users?: any[];
+
+    // Keep snake_case properties for backward compatibility
+    start_time?: Date;
+    end_time?: Date;
+    jitsi_meeting_id?: string;
 }
 
 export interface MeetingUser {
     id?: string;
-    meeting_id: string;
-    user_id: string;
-    is_accepted: boolean;
+    meetingId: string;
+    userId: string;
+    isAccepted: boolean;
     user?: any;
+
+    // Keep snake_case properties for backward compatibility
+    meeting_id?: string;
+    user_id?: string;
+    is_accepted?: boolean;
 }
 
 export interface JitsiConfig {
