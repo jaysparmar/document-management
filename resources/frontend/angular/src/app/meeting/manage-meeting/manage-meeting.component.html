@@ -103,12 +103,12 @@
           </div>
           <div class="row mt-3">
             <div class="col-md-12 text-right">
-              <button type="button" class="btn btn-secondary mr-2" (click)="cancel()">{{ 'CANCEL' | translate }}</button>
-              <button *ngIf="isEditMode" type="button" class="btn btn-danger mr-2" (click)="deleteMeeting()">
+              <button type="button" class="btn btn-secondary me-2" (click)="cancel()">{{ 'CANCEL' | translate }}</button>
+              <button *ngIf="isEditMode" type="button" class="btn btn-danger me-2" (click)="deleteMeeting()">
                 <i class="fas fa-trash"></i> {{ 'DELETE' | translate }}
               </button>
               <button type="submit" class="btn btn-primary" [disabled]="meetingForm.invalid || loading">
-                <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
                 {{ isEditMode ? ('UPDATE' | translate) : ('SAVE' | translate) }}
               </button>
             </div>
