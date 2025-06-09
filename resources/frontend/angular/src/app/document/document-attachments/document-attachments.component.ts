@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentInfo, DocumentAttachment } from '@core/domain-classes/document-info';
 import { DocumentService } from '../document.service';
@@ -16,6 +16,9 @@ export class DocumentAttachmentsComponent extends BaseComponent implements OnIni
   documentId: string;
   loading = false;
   attachments: DocumentAttachment[] = [];
+  selectedFiles: File[] = [];
+  @ViewChild('fileInput') fileInput: ElementRef;
+  uploadInProgress = false;
 
   constructor(
     private documentService: DocumentService,
@@ -86,5 +89,58 @@ export class DocumentAttachmentsComponent extends BaseComponent implements OnIni
 
   goToDocumentDetails(): void {
     this.router.navigate(['/document-details', this.documentId]);
+  }
+
+  onFileSelected(event: any): void {
+    this.selectedFiles = Array.from(event.target.files);
+    if (this.selectedFiles.length > 0) {
+      this.uploadAttachments();
+    }
+  }
+
+  uploadAttachments(): void {
+    if (this.selectedFiles.length === 0) {
+      return;
+    }
+
+    this.uploadInProgress = true;
+    this.loading = true;
+
+    // Extract file names and extensions
+    const names = this.selectedFiles.map(file => file.name);
+    const extensions = this.selectedFiles.map(file => {
+      const parts = file.name.split('.');
+      return parts.length > 1 ? parts[parts.length - 1] : '';
+    });
+
+    this.sub$.sink = this.documentService.addAttachment(this.documentId, this.selectedFiles, names, extensions)
+      .subscribe(
+        (response) => {
+          this.toastr.success(this.translateService.instant('ATTACHMENTS_ADDED_SUCCESSFULLY'));
+          this.getDocument(); // Refresh the attachments list
+          this.clearFileInput();
+          this.uploadInProgress = false;
+          this.loading = false;
+        },
+        (error) => {
+          this.toastr.error(this.translateService.instant('ERROR_ADDING_ATTACHMENTS'));
+          console.error(error);
+          this.uploadInProgress = false;
+          this.loading = false;
+        }
+      );
+  }
+
+  clearFileInput(): void {
+    this.selectedFiles = [];
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  openFileSelector(): void {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.click();
+    }
   }
 }

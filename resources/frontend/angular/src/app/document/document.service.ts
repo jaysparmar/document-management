@@ -237,4 +237,26 @@ export class DocumentService {
       .delete<void>(url)
       .pipe(catchError(this.commonHttpErrorService.handleError));
   }
+
+  addAttachment(documentId: string, attachments: File[], names?: string[], extensions?: string[], locations?: string[]): Observable<any | CommonError> {
+    const url = `document/${documentId}/attachment`;
+    const formData = new FormData();
+
+    attachments.forEach((file, index) => {
+      formData.append(`attachments[${index}]`, file);
+      if (names && names[index]) {
+        formData.append(`attachmentNames[${index}]`, names[index]);
+      }
+      if (extensions && extensions[index]) {
+        formData.append(`attachmentExtensions[${index}]`, extensions[index]);
+      }
+      if (locations && locations[index]) {
+        formData.append(`attachmentLocations[${index}]`, locations[index]);
+      }
+    });
+
+    return this.httpClient
+      .post<any>(url, formData)
+      .pipe(catchError(this.commonHttpErrorService.handleError));
+  }
 }
