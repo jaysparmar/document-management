@@ -5,7 +5,7 @@ export interface Meeting {
     start_time: Date;
     end_time: Date;
     jitsi_meeting_id?: string;
-    created_by?: string;
+    createdBy?: string;
     isDeleted?: boolean;
     creator?: any;
     users?: any[];

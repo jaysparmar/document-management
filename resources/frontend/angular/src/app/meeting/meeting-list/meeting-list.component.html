@@ -22,7 +22,7 @@
                 <th>{{'DESCRIPTION' | translate}}</th>
                 <th>{{'START_TIME' | translate}}</th>
                 <th>{{'END_TIME' | translate}}</th>
-                <th>{{'CREATED_BY' | translate}}</th>
+                <th>{{'createdBy' | translate}}</th>
                 <th>{{'ACTIONS' | translate}}</th>
               </tr>
             </thead>
@@ -47,10 +47,11 @@
                   <button class="btn btn-sm btn-primary mr-2" (click)="joinMeeting(meeting)">
                     <i class="fas fa-video"></i> {{'JOIN' | translate}}
                   </button>
-                  <button *ngIf="meeting.created_by === currentUserId" class="btn btn-sm btn-info mr-2" (click)="editMeeting(meeting)">
+
+                  <button *ngIf="meeting.createdBy === currentUserId" class="btn btn-sm btn-info mr-2" (click)="editMeeting(meeting)">
                     <i class="fas fa-edit"></i> {{'EDIT' | translate}}
                   </button>
-                  <button *ngIf="meeting.created_by === currentUserId" class="btn btn-sm btn-danger" (click)="deleteMeeting(meeting)">
+                  <button *ngIf="meeting.createdBy === currentUserId" class="btn btn-sm btn-danger" (click)="deleteMeeting(meeting)">
                     <i class="fas fa-trash"></i> {{'DELETE' | translate}}
                   </button>
                 </td>

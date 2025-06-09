@@ -27,6 +27,10 @@ export class MeetingListComponent extends BaseComponent implements OnInit {
     super();
   }
 
+  log(data:any):void{
+    console.log('Debug:',data);
+  }
+
   ngOnInit(): void {
     const userInfo = this.securityService.getUserDetail();
     if (userInfo && userInfo.user) {
