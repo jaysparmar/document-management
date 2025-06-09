@@ -83,7 +83,8 @@ class ChatifyApiController extends Controller
             $fileName = uniqid() . '_' . $attachment->getClientOriginalName();
             $path = $attachment->storeAs('chatify/attachments', $fileName, 'public');
             $message->attachment = $fileName;
-            $message->attachment_url = Storage::url($path);
+            // Ensure consistent URL format with getSharedPhotos method
+            $message->attachment_url = url(Storage::url('chatify/attachments/' . $fileName));
         }
 
 
@@ -134,7 +135,7 @@ class ChatifyApiController extends Controller
         $shared = $messagesWithFiles->map(function ($msg) {
             return [
                 'name' => $msg->attachment,
-                'url' => Storage::url('chatify/attachments/' . $msg->attachment),
+                'url' => url(Storage::url('chatify/attachments/' . $msg->attachment)),
             ];
         });
 

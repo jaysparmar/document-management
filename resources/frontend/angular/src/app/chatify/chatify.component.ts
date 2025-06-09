@@ -179,4 +179,18 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
     const extension = filename.split('.').pop()?.toLowerCase();
     return extension ? imageExtensions.includes(extension) : false;
   }
+
+  handleImageError(event: any): void {
+    // Hide the image if it fails to load
+    event.target.style.display = 'none';
+
+    // Log error for debugging
+    console.error('Failed to load image:', event.target.src);
+
+    // Optionally show a message or fallback image
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'image-error';
+    errorDiv.textContent = 'Image could not be loaded';
+    event.target.parentNode.appendChild(errorDiv);
+  }
 }

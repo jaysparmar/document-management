@@ -95,7 +95,7 @@
                     {{ message.attachment }}
                   </a>
                   <div *ngIf="isImage(message.attachment)" class="image-preview">
-                    <img [src]="message.attachment_url" alt="Image attachment" class="attachment-image">
+                    <img [src]="message.attachment_url" alt="Image attachment" class="attachment-image" (error)="handleImageError($event)">
                   </div>
                 </div>
               </div>
