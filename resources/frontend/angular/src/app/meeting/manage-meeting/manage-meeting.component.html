@@ -61,10 +61,11 @@
                   bindLabel="email"
                   bindValue="id"
                   [multiple]="true"
+                  [searchable]="true"
                   placeholder="{{ 'SELECT_PARTICIPANTS' | translate }}"
                   formControlName="userIds"
                   id="userIds"
-                  appendTo="body"
+                  class="mdc-menu-surface-open"
                 >
                   <ng-template ng-label-tmp let-item="item" let-clear="clear">
                     <span class="ng-value-label">
