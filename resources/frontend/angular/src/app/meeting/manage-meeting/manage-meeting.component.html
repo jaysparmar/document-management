@@ -57,8 +57,31 @@
               <div class="form-group">
                 <label for="user_ids">{{ 'PARTICIPANTS' | translate }}</label>
                 <select multiple id="user_ids" formControlName="user_ids" class="form-control">
-                  <!-- User options would be populated here -->
+                  <option *ngFor="let user of users" [value]="user.id">
+                    {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+                  </option>
                 </select>
+                <small class="form-text text-muted">{{ 'PARTICIPANTS_HELP_TEXT' | translate }}</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Meeting Link Section (visible whenever a link is available) -->
+          <div class="row mt-3" *ngIf="meetingLink">
+            <div class="col-md-12">
+              <div class="card bg-light">
+                <div class="card-body">
+                  <h5 class="card-title">{{ 'MEETING_LINK' | translate }}</h5>
+                  <p class="card-text">{{ 'SHARE_LINK_DESCRIPTION' | translate }}</p>
+                  <div class="input-group">
+                    <input type="text" class="form-control" [value]="meetingLink" readonly>
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button" (click)="copyMeetingLink()">
+                        <i class="fas fa-copy"></i> {{ 'COPY' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
