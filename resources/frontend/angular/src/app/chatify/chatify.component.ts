@@ -69,6 +69,9 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
         }
       });
   }
+  log(data: any): void {
+    console.log('Debug:', data);
+  }
 
   loadContacts(): void {
     this.loading = true;

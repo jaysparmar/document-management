@@ -100,12 +100,12 @@
                 <div class="message-time">{{ message.created_at | date:'short' }}</div>
               </div>
               <div *ngIf="message.attachment" class="message-attachment">
-                <a [href]="message.attachment_url" target="_blank" class="attachment-link">
+                <a [href]="message.attachmentUrl" target="_blank" class="attachment-link">
                   <mat-icon>attachment</mat-icon>
                   {{ message.attachment }}
                 </a>
                 <div *ngIf="isImage(message.attachment)" class="image-preview">
-                  <img [src]="message.attachment_url" alt="Image attachment" class="attachment-image" (error)="handleImageError($event)">
+                  <img [src]="message.attachmentUrl" alt="Image attachment" class="attachment-image" (error)="handleImageError($event)">
                 </div>
               </div>
             </div>
