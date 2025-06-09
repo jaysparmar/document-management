@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Ramsey\Uuid\Uuid;
 
 class Clients extends Authenticatable
 {
@@ -40,7 +43,7 @@ class Clients extends Authenticatable
 
     public function documents()
     {
-        return $this->hasMany(Document::class, 'client_id');
+        return $this->hasMany(Documents::class, 'client_id');
     }
 
     public function pendingDocuments()
@@ -57,14 +60,14 @@ class Clients extends Authenticatable
     {
         parent::boot();
 
-        static::creating(function (Model $model) {
+        static::creating(function ( $model) {
             $userId = Auth::parseToken()->getPayload()->get('userId');
             $model->createdBy = $userId;
             $model->modifiedBy = $userId;
             $model->setAttribute($model->getKeyName(), Uuid::uuid4());
         });
 
-        static::updating(function (Model $model) {
+        static::updating(function ( $model) {
             $userId = Auth::parseToken()->getPayload()->get('userId');
             $model->modifiedBy = $userId;
         });
