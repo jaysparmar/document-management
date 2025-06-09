@@ -218,10 +218,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['middleware' => ['hasToken:ALL_DOCUMENTS_EDIT_DOCUMENT,ASSIGNED_DOCUMENTS_EDIT_DOCUMENT']], function () {
         Route::put('/document/{id}', [DocumentController::class, 'updateDocument']);
+        Route::post('/document/{id}/attachment', [DocumentController::class, 'addAttachment']);
     });
 
     Route::group(['middleware' => ['hasToken:ALL_DOCUMENTS_DELETE_DOCUMENT,ASSIGNED_DOCUMENTS_DELETE_DOCUMENT,ARCHIVE_DOCUMENT_DELETE_DOCUMENTS']], function () {
         Route::delete('/document/{id}', [DocumentController::class, 'deleteDocument']);
+        Route::delete('/document-attachment/{id}', [DocumentController::class, 'deleteAttachment']);
     });
 
     Route::group(['middleware' => ['hasToken:ALL_DOCUMENTS_VIEW_DETAIL,

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use App\Repositories\Implementation\BaseRepository;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Services\DocumentIndexer;
+use Illuminate\Support\Facades\Storage;
 
 //use Your Model
 
@@ -741,6 +742,16 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
         if ($document) {
             // Load document attachments
             $document->load('documentAttachments');
+
+            // Convert relative paths to full storage URLs for attachments
+            if ($document->documentAttachments) {
+                foreach ($document->documentAttachments as $attachment) {
+                    if ($attachment->url) {
+                        $location = $attachment->location ?? 'local';
+                        $attachment->url = url(Storage::disk($location)->url($attachment->url));
+                    }
+                }
+            }
         }
 
         return $document;
@@ -813,6 +824,119 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error in removing document from deep search.',
+            ], 409);
+        }
+    }
+
+    public function deleteAttachment($id)
+    {
+        try {
+            $attachment = \App\Models\DocumentAttachments::find($id);
+            if ($attachment == null) {
+                return response()->json([
+                    'message' => 'Attachment not found.',
+                ], 404);
+            }
+
+            // Delete the file from storage
+            $location = $attachment->location ?? 'local';
+            if (\Illuminate\Support\Facades\Storage::disk($location)->exists($attachment->url)) {
+                \Illuminate\Support\Facades\Storage::disk($location)->delete($attachment->url);
+            }
+
+            // Delete the attachment record
+            $attachment->delete();
+
+            return response()->json([], 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error in deleting attachment: ' . $e->getMessage(),
+            ], 409);
+        }
+    }
+
+    public function addAttachment($documentId, $request)
+    {
+        try {
+            // Check if document exists
+            $document = $this->model->find($documentId);
+            if ($document == null) {
+                return response()->json([
+                    'message' => 'Document not found.',
+                ], 404);
+            }
+
+            $attachments = [];
+            $location = $request->location ?? 'local';
+
+            // Check S3 configuration if using S3
+            if ($location == 's3') {
+                $s3Key = config('filesystems.disks.s3.key');
+                $s3Secret = config('filesystems.disks.s3.secret');
+                $s3Region = config('filesystems.disks.s3.region');
+                $s3Bucket = config('filesystems.disks.s3.bucket');
+
+                if (empty($s3Key) || empty($s3Secret) || empty($s3Region) || empty($s3Bucket)) {
+                    return response()->json([
+                        'message' => 'Error: S3 configuration is missing',
+                    ], 409);
+                }
+            }
+
+            // Process attachments
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $index => $attachmentFile) {
+                    if ($attachmentFile->isValid()) {
+                        $attachmentLocation = $request->input("attachmentLocations.$index") ?? $location;
+
+                        // Check S3 configuration if using S3
+                        if ($attachmentLocation == 's3') {
+                            $s3Key = config('filesystems.disks.s3.key');
+                            $s3Secret = config('filesystems.disks.s3.secret');
+                            $s3Region = config('filesystems.disks.s3.region');
+                            $s3Bucket = config('filesystems.disks.s3.bucket');
+
+                            if (empty($s3Key) || empty($s3Secret) || empty($s3Region) || empty($s3Bucket)) {
+                                continue; // Skip this attachment if S3 config is missing
+                            }
+                        }
+
+                        $attachmentPath = $attachmentFile->storeAs(
+                            'document-attachments',
+                            \Ramsey\Uuid\Uuid::uuid4() . '.' . $attachmentFile->getClientOriginalExtension(),
+                            $attachmentLocation
+                        );
+
+                        if ($attachmentPath) {
+                            // Create attachment record
+                            $attachment = \App\Models\DocumentAttachments::create([
+                                'documentId' => $documentId,
+                                'name' => $request->input("attachmentNames.$index") ?? $attachmentFile->getClientOriginalName(),
+                                'url' => $attachmentPath,
+                                'extension' => $request->input("attachmentExtensions.$index") ?? $attachmentFile->getClientOriginalExtension(),
+                                'location' => $attachmentLocation
+                            ]);
+
+                            // Add to response array
+                            $attachments[] = $attachment;
+                        }
+                    }
+                }
+            }
+
+            if (count($attachments) === 0) {
+                return response()->json([
+                    'message' => 'No valid attachments were provided.',
+                ], 400);
+            }
+
+            return response()->json([
+                'message' => 'Attachments added successfully.',
+                'attachments' => $attachments
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error in adding attachments: ' . $e->getMessage(),
             ], 409);
         }
     }

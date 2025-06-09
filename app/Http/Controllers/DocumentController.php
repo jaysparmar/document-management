@@ -341,4 +341,27 @@ class DocumentController extends Controller
             throw $th;
         }
     }
+
+    /**
+     * Delete a document attachment
+     *
+     * @param string $id The ID of the attachment to delete
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteAttachment($id)
+    {
+        return $this->documentRepository->deleteAttachment($id);
+    }
+
+    /**
+     * Add attachments to an existing document
+     *
+     * @param \Illuminate\Http\Request $request The request containing attachment files
+     * @param string $id The ID of the document to add attachments to
+     * @return \Illuminate\Http\Response
+     */
+    public function addAttachment(Request $request, $id)
+    {
+        return $this->documentRepository->addAttachment($id, $request);
+    }
 }

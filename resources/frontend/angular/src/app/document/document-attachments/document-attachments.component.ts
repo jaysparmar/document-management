@@ -58,8 +58,26 @@ export class DocumentAttachmentsComponent extends BaseComponent implements OnIni
     }
   }
 
-  log(data:any): void{
-    console.log(data)
+
+
+  deleteAttachment(attachment: DocumentAttachment): void {
+    if (confirm(this.translateService.instant('CONFIRM_DELETE_ATTACHMENT'))) {
+      this.loading = true;
+      this.sub$.sink = this.documentService.deleteAttachment(attachment.id)
+        .subscribe(
+          () => {
+            this.toastr.success(this.translateService.instant('ATTACHMENT_DELETED_SUCCESSFULLY'));
+            // Remove the deleted attachment from the list
+            this.attachments = this.attachments.filter(a => a.id !== attachment.id);
+            this.loading = false;
+          },
+          (error) => {
+            this.loading = false;
+            this.toastr.error(this.translateService.instant('ERROR_DELETING_ATTACHMENT'));
+            console.error(error);
+          }
+        );
+    }
   }
 
   goBack(): void {

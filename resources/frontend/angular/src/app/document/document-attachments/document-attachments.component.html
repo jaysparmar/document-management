@@ -61,7 +61,10 @@
                           <i-feather name="download" class="btn-primary small-icon"></i-feather>
                           <span class="d-none d-sm-inline"> {{'DOWNLOAD' | translate}}</span>
                         </button>
-                        <button (click)="log(document)"></button>
+                        <button class="btn btn-danger btn-sm" (click)="deleteAttachment(attachment)">
+                          <i-feather name="trash-2" class="btn-danger small-icon"></i-feather>
+                          <span class="d-none d-sm-inline"> {{'DELETE' | translate}}</span>
+                        </button>
                       </td>
                     </tr>
                   </tbody>

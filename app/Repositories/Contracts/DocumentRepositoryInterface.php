@@ -18,4 +18,6 @@ interface DocumentRepositoryInterface extends BaseRepositoryInterface
     public function archiveDocument($id);
     public function addDOocumentToDeepSearch($id);
     public function removeDocumentFromDeepSearch($id);
+    public function deleteAttachment($id);
+    public function addAttachment($documentId, $request);
 }

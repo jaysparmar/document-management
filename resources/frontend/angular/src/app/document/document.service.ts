@@ -230,4 +230,11 @@ export class DocumentService {
       .delete(url)
       .pipe(catchError(this.commonHttpErrorService.handleError));
   }
+
+  deleteAttachment(id: string): Observable<void | CommonError> {
+    const url = `document-attachment/${id}`;
+    return this.httpClient
+      .delete<void>(url)
+      .pipe(catchError(this.commonHttpErrorService.handleError));
+  }
 }
