@@ -328,7 +328,20 @@ function renderMessages(messages) {
     messages.forEach(message => {
         const isOwnMessage = message.isMine !== undefined ? message.isMine : message.from_id === currentClientId && message.from_type === 'client';
         const messageClass = isOwnMessage ? 'own-message' : 'other-message';
-        const time = new Date(message.created_at).toLocaleString();
+
+        // Fix date parsing by handling the microseconds format
+        let time;
+        try {
+            // Replace microseconds with milliseconds (3 digits instead of 6)
+            const fixedDateStr = message.createdAt.replace(/\.\d{6}Z/, (match) => {
+                return '.' + match.substring(1, 4) + 'Z';
+            });
+            time = new Date(fixedDateStr).toLocaleString();
+        } catch (e) {
+            console.error('Error parsing date:', message.createdAt, e);
+            time = 'Unknown date';
+        }
+
 
         html += `
             <div class="message ${messageClass}">
@@ -338,13 +351,13 @@ function renderMessages(messages) {
                 </div>
                 ${message.attachment ? `
                     <div class="message-attachment">
-                        <a href="${message.attachment_url || '#'}" target="_blank" class="attachment-link">
+                        <a href="${message.attachmentUrl || '#'}" target="_blank" class="attachment-link">
                             <i class="fas fa-paperclip"></i>
                             ${message.attachment}
                         </a>
-                        ${isImage(message.attachment) && message.attachment_url ? `
+                        ${isImage(message.attachment) && message.attachmentUrl ? `
                             <div class="image-preview">
-                                <img src="${message.attachment_url}" alt="Image attachment" class="attachment-image" onerror="handleImageError(this)">
+                                <img src="${message.attachmentUrl}" alt="Image attachment" class="attachment-image" onerror="handleImageError(this)">
                             </div>
                         ` : isImage(message.attachment) ? `
                             <div class="image-error">Image URL not available</div>
