@@ -52,6 +52,8 @@ Route::prefix('client-portal')->name('client-portal.')->middleware(['auth:client
     Route::prefix('chat')->group(function () {
         Route::get('/contacts', [App\Http\Controllers\ClientChatController::class, 'getContacts'])->name('chat.contacts');
         Route::post('/messages', [App\Http\Controllers\ClientChatController::class, 'fetchMessages'])->name('chat.messages');
+        Route::post('/new-messages', [App\Http\Controllers\ClientChatController::class, 'fetchNewMessages'])->name('chat.new-messages');
+        Route::get('/unread-count', [App\Http\Controllers\ClientChatController::class, 'getUnreadCount'])->name('chat.unread-count');
         Route::post('/send', [App\Http\Controllers\ClientChatController::class, 'sendMessage'])->name('chat.send');
         Route::post('/search', [App\Http\Controllers\ClientChatController::class, 'searchUsers'])->name('chat.search');
     });

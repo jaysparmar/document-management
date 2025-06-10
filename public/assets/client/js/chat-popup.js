@@ -17,6 +17,10 @@ let selectedUser = null;
 let contacts = [];
 let messages = [];
 let currentClientId = null;
+let lastMessageTimestamp = null;
+let pollingInterval = null;
+let unreadCount = 0;
+let isAtBottom = true; // Track if the user is at the bottom of the chat
 
 // DOM Elements
 let chatButton;
@@ -36,6 +40,7 @@ let fileInput;
 let attachmentPreview;
 let attachmentName;
 let removeAttachmentBtn;
+let chatBadge;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -68,6 +73,17 @@ document.addEventListener('DOMContentLoaded', function() {
     attachmentName = document.getElementById('attachmentName');
     removeAttachmentBtn = document.getElementById('removeAttachmentBtn');
 
+    // Create badge element for unread messages
+    chatBadge = document.createElement('span');
+    chatBadge.className = 'chat-badge';
+    chatBadge.style.display = 'none';
+    chatBadge.textContent = '0';
+
+    // Add badge to chat button
+    if (chatButton) {
+        chatButton.querySelector('button').appendChild(chatBadge);
+    }
+
     // Log all DOM elements to check if they exist
     console.log('DOM elements initialized:');
     console.log('chatButton:', chatButton !== null);
@@ -76,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('contactsList:', contactsList !== null);
     console.log('searchQuery:', searchQuery !== null);
     console.log('searchUsersBtn:', searchUsersBtn !== null);
+    console.log('chatBadge:', chatBadge !== null);
 
     // Get the current client ID from the meta tag
     const clientIdMeta = document.querySelector('meta[name="client-id"]');
@@ -103,6 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chatPopup.style.display === 'flex') {
             console.log('Loading contacts...');
             loadContacts();
+
+            // Reset unread count when opening the chat
+            updateUnreadCount(0);
         }
     });
 
@@ -119,6 +139,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     fileInput.addEventListener('change', handleFileSelect);
     removeAttachmentBtn.addEventListener('click', removeAttachment);
+
+    // Stop polling when the page is unloaded
+    window.addEventListener('beforeunload', function() {
+        console.log('Page unloading, stopping polling');
+        stopPollingForUnreadMessages();
+    });
+
+    // Add scroll event listener to track if user is at bottom of chat
+    if (messagesContainer) {
+        messagesContainer.addEventListener('scroll', function() {
+            isAtBottom = isUserAtBottom();
+        });
+    }
+
+    // Start polling for unread messages
+    startPollingForUnreadMessages();
 });
 
 // Toggle chat popup
@@ -146,6 +182,118 @@ function toggleChatPopup() {
 function closeChatPopupHandler() {
     console.log('closeChatPopupHandler function called');
     chatPopup.style.display = 'none';
+}
+
+// Start polling for unread messages
+function startPollingForUnreadMessages() {
+    console.log('Starting polling for unread messages');
+
+    // Check for unread messages immediately
+    checkUnreadCount();
+
+    // Set up polling interval (every 2 seconds)
+    pollingInterval = setInterval(function() {
+        // Check for unread messages
+        checkUnreadCount();
+
+        // If a user is selected and the chat is open, check for new messages
+        if (selectedUser && chatPopup.style.display === 'flex') {
+            checkForNewMessages();
+        }
+    }, 2000); // 2000 ms = 2 seconds
+}
+
+// Stop polling for unread messages
+function stopPollingForUnreadMessages() {
+    console.log('Stopping polling for unread messages');
+
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+    }
+}
+
+// Check for unread messages count
+function checkUnreadCount() {
+    console.log('Checking unread count');
+
+    fetch('/client-portal/chat/unread-count')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Unread count:', data.unread_count);
+            updateUnreadCount(data.unread_count);
+        })
+        .catch(error => {
+            console.error('Error checking unread count:', error);
+        });
+}
+
+// Update unread count badge
+function updateUnreadCount(count) {
+    unreadCount = count;
+
+    if (count > 0) {
+        chatBadge.textContent = count > 99 ? '99+' : count.toString();
+        chatBadge.style.display = 'flex';
+    } else {
+        chatBadge.style.display = 'none';
+    }
+}
+
+// Check for new messages
+function checkForNewMessages() {
+    if (!selectedUser) return;
+
+    console.log('Checking for new messages with user:', selectedUser.id);
+
+    const formData = new FormData();
+    formData.append('id', selectedUser.id);
+    formData.append('type', selectedUser.type || 'user');
+
+    // If we have a last message timestamp, include it
+    if (lastMessageTimestamp) {
+        formData.append('since', lastMessageTimestamp);
+    }
+
+    fetch('/client-portal/chat/new-messages', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('New messages:', data.messages);
+
+            // If there are new messages, append them to the chat
+            if (data.messages && data.messages.length > 0) {
+                appendNewMessages(data.messages);
+
+                // Update the last message timestamp
+                const lastMessage = data.messages[data.messages.length - 1];
+                lastMessageTimestamp = lastMessage.created_at;
+            }
+
+            // Update unread count
+            updateUnreadCount(data.unread_count);
+        })
+        .catch(error => {
+            console.error('Error checking for new messages:', error);
+        });
+}
+
+// Append new messages to the chat
+function appendNewMessages(newMessages) {
+    if (!newMessages || newMessages.length === 0) return;
+
+    console.log('Appending new messages:', newMessages);
+
+    // Add new messages to the messages array
+    messages = messages.concat(newMessages);
+
+    // Render all messages
+    renderMessages(messages);
 }
 
 // Load contacts
@@ -272,6 +420,9 @@ window.selectUserHandler = function(element) {
 function loadMessages(userId, userType = 'user') {
     console.log('loadMessages function called with userId:', userId, 'userType:', userType);
 
+    // Set isAtBottom to true for initial load
+    isAtBottom = true;
+
     // Show loading spinner
     messagesContainer.innerHTML = `
         <div class="loading-spinner text-center py-3">
@@ -302,6 +453,13 @@ function loadMessages(userId, userType = 'user') {
         .then(data => {
             messages = data.messages;
             renderMessages(messages);
+
+            // Update the last message timestamp if there are messages
+            if (messages && messages.length > 0) {
+                const lastMessage = messages[messages.length - 1];
+                lastMessageTimestamp = lastMessage.created_at;
+                console.log('Last message timestamp set to:', lastMessageTimestamp);
+            }
         })
         .catch(error => {
             console.error('Error loading messages:', error);
@@ -370,8 +528,10 @@ function renderMessages(messages) {
 
     messagesContainer.innerHTML = html;
 
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // Only scroll to bottom if user was already at the bottom
+    if (isAtBottom) {
+        scrollToBottom();
+    }
 }
 
 // Send message
@@ -383,6 +543,9 @@ function sendMessage(event) {
         console.log('No message or file to send, or no selected user');
         return;
     }
+
+    // Always scroll to bottom after sending a message
+    isAtBottom = true;
 
     console.log('Sending message to user:', selectedUser);
 
@@ -533,3 +696,22 @@ window.handleImageError = function(img) {
     errorDiv.textContent = 'Image could not be loaded';
     img.parentNode.appendChild(errorDiv);
 };
+
+// Check if user is at the bottom of the chat
+function isUserAtBottom() {
+    if (!messagesContainer) return true;
+
+    // Calculate how far from the bottom (with a small threshold for rounding errors)
+    const threshold = 30; // pixels
+    const scrollBottom = messagesContainer.scrollTop + messagesContainer.clientHeight;
+    const scrollHeight = messagesContainer.scrollHeight;
+
+    return scrollBottom >= scrollHeight - threshold;
+}
+
+// Scroll to the bottom of the messages container
+function scrollToBottom() {
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+}

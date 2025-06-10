@@ -18,6 +18,7 @@ class ChMessage extends Model
         'created_at',
         'from_type',
         'to_type',
+        'read_at',
     ];
 
     public $incrementing = false; // Because you're using UUIDs
