@@ -73,7 +73,12 @@
                                         <i class="fas fa-eye me-2"></i>View
                                     </a>
 
-                                    @if(!$meeting->pivot->is_accepted)
+                                    @if($meeting->pivot->is_accepted)
+                                        <a href="{{ route('client-portal.meetings.join', $meeting->id) }}"
+                                           class="btn btn-link text-primary text-gradient px-3 mb-0">
+                                            <i class="fas fa-video me-2"></i>Join
+                                        </a>
+                                    @else
                                         <form action="{{ route('client-portal.meetings.accept', $meeting->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-link text-success text-gradient px-3 mb-0">

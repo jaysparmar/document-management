@@ -23,6 +23,11 @@
                     <div class="col-md-4 text-md-end">
                         @if($meeting->pivot->is_accepted)
                             <span class="badge bg-gradient-success mb-2">Accepted</span>
+                            <div class="mt-2">
+                                <a href="{{ route('client-portal.meetings.join', $meeting->id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-video me-2"></i>Join Meeting
+                                </a>
+                            </div>
                         @else
                             <span class="badge bg-gradient-warning mb-2">Pending</span>
                             <form action="{{ route('client-portal.meetings.accept', $meeting->id) }}" method="POST" class="mt-2">

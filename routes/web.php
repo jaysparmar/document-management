@@ -52,6 +52,8 @@ Route::prefix('client-portal')->name('client-portal.')->middleware(['auth:client
     Route::get('meetings', [App\Http\Controllers\Client\MeetingController::class, 'index'])->name('meetings.index');
     Route::get('meetings/{id}', [App\Http\Controllers\Client\MeetingController::class, 'show'])->name('meetings.show');
     Route::post('meetings/{id}/accept', [App\Http\Controllers\Client\MeetingController::class, 'accept'])->name('meetings.accept');
+    Route::get('meetings/{id}/join', [App\Http\Controllers\Client\MeetingController::class, 'join'])->name('meetings.join');
+    Route::get('meetings/{id}/jitsi', [App\Http\Controllers\Client\MeetingController::class, 'getJitsiInfo'])->name('meetings.jitsi');
 
     // Client Chat Routes
     Route::prefix('chat')->group(function () {
