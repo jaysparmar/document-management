@@ -221,7 +221,10 @@ function checkUnreadCount() {
         .then(response => response.json())
         .then(data => {
             console.log('Unread count:', data.unread_count);
-            updateUnreadCount(data.unread_count);
+            // Only update if the count has changed
+            if (data.unread_count !== unreadCount) {
+                updateUnreadCount(data.unread_count);
+            }
         })
         .catch(error => {
             console.error('Error checking unread count:', error);
@@ -275,8 +278,10 @@ function checkForNewMessages() {
                 lastMessageTimestamp = lastMessage.created_at;
             }
 
-            // Update unread count
-            updateUnreadCount(data.unread_count);
+            // Only update unread count if there are new unread messages
+            if (data.unread_count !== unreadCount) {
+                updateUnreadCount(data.unread_count);
+            }
         })
         .catch(error => {
             console.error('Error checking for new messages:', error);
@@ -292,8 +297,10 @@ function appendNewMessages(newMessages) {
     // Add new messages to the messages array
     messages = messages.concat(newMessages);
 
-    // Render all messages
-    renderMessages(messages);
+    // Render all messages only if there are new messages
+    if (newMessages.length > 0) {
+        renderMessages(messages);
+    }
 }
 
 // Load contacts

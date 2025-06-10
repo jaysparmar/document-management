@@ -21,6 +21,8 @@ export class ChatifyService {
     private commonHttpErrorService: CommonHttpErrorService
   ) {}
 
+  private lastUnreadCount: number = 0;
+
   // Start polling for new messages
   startPolling(userId: string, userType: string = 'user'): void {
     this.selectedUserId = userId;
@@ -45,8 +47,11 @@ export class ChatifyService {
             });
           }
 
-          // Update unread count
-          this.unreadCountChanged.next(response.unread_count);
+          // Only update unread count if it has changed
+          if (response.unread_count !== this.lastUnreadCount) {
+            this.lastUnreadCount = response.unread_count;
+            this.unreadCountChanged.next(response.unread_count);
+          }
         },
         error => {
           console.error('Error polling for new messages:', error);
