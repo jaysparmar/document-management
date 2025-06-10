@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Users;
+use App\Models\Clients;
 
 class ChatifyApiController extends Controller
 {
@@ -18,7 +19,7 @@ class ChatifyApiController extends Controller
      */
     public function getContacts(Request $request)
     {
-
+        // Get users
         $users = Users::where('id', '!=', Auth::id())->get()->map(function ($user) {
             return [
                 'id' => $user->id,
@@ -26,10 +27,26 @@ class ChatifyApiController extends Controller
                 'avatar' => null, // TODO: Add avatar URL logic
                 'active_status' => true, // TODO: Add real-time online check
                 'email' => $user->email,
+                'type' => 'user',
             ];
         });
 
-        return response()->json($users);
+        // Get clients
+        $clients = Clients::all()->map(function ($client) {
+            return [
+                'id' => $client->id,
+                'name' => $client->companyName . ' (' . $client->contactPerson . ')',
+                'avatar' => null,
+                'active_status' => true,
+                'email' => $client->email,
+                'type' => 'client',
+            ];
+        });
+
+        // Combine users and clients
+        $contacts = $users->concat($clients);
+
+        return response()->json($contacts);
     }
 
     /**
@@ -38,17 +55,25 @@ class ChatifyApiController extends Controller
     public function fetchMessages(Request $request)
     {
         $userId = $request->input('id');
+        $userType = $request->input('type', 'user'); // Default to 'user' if not provided
         $authId = Auth::id();
+        $authType = 'user'; // Current authenticated user is always a user
 
-        $messages = ChMessage::where(function ($q) use ($authId, $userId) {
-            $q->where('from_id', $authId)->where('to_id', $userId);
-        })->orWhere(function ($q) use ($authId, $userId) {
-            $q->where('from_id', $userId)->where('to_id', $authId);
+        $messages = ChMessage::where(function ($q) use ($authId, $userId, $authType, $userType) {
+            $q->where('from_id', $authId)
+              ->where('from_type', $authType)
+              ->where('to_id', $userId)
+              ->where('to_type', $userType);
+        })->orWhere(function ($q) use ($authId, $userId, $authType, $userType) {
+            $q->where('from_id', $userId)
+              ->where('from_type', $userType)
+              ->where('to_id', $authId)
+              ->where('to_type', $authType);
         })->orderBy('created_at', 'asc')->get();
 
         // Add isMine flag to each message to help frontend determine message position
-        $messages = $messages->map(function ($message) use ($authId) {
-            $message->isMine = $message->from_id === $authId;
+        $messages = $messages->map(function ($message) use ($authId, $authType) {
+            $message->isMine = $message->from_id === $authId && $message->from_type === $authType;
             return $message;
         });
 
@@ -64,20 +89,38 @@ class ChatifyApiController extends Controller
     {
         $request->validate([
             'message' => 'nullable|string',
-            'id' => 'required|exists:users,id',
+            'id' => 'required',
+            'type' => 'required|in:user,client',
             'file' => 'nullable|file|max:10240', // max 10MB
         ]);
 
         $authId = Auth::id();
         $toId = $request->input('id');
+        $toType = $request->input('type');
         $messageText = $request->input('message');
         $attachment = $request->file('file');
+
+        // Validate that the recipient exists based on type
+        if ($toType === 'user') {
+            $exists = Users::where('id', $toId)->exists();
+        } else {
+            $exists = Clients::where('id', $toId)->exists();
+        }
+
+        if (!$exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Recipient not found',
+            ], 404);
+        }
 
         $message = new ChMessage();
         $message->id = Str::uuid();
         $message->body = $messageText ?? '';
         $message->from_id = $authId;
+        $message->from_type = 'user'; // Current authenticated user is always a user
         $message->to_id = $toId;
+        $message->to_type = $toType;
 
         if ($attachment) {
             $fileName = uniqid() . '_' . $attachment->getClientOriginalName();
@@ -86,8 +129,6 @@ class ChatifyApiController extends Controller
             // Ensure consistent URL format with getSharedPhotos method
             $message->attachment_url = url(Storage::url('chatify/attachments/' . $fileName));
         }
-
-
 
         $message->save();
 
@@ -151,6 +192,7 @@ class ChatifyApiController extends Controller
     {
         $query = $request->input('input');
 
+        // Search users
         $users = Users::where('id', '!=', Auth::id())
             ->where(function ($q) use ($query) {
                 $q->where('firstName', 'LIKE', "%{$query}%")
@@ -163,9 +205,29 @@ class ChatifyApiController extends Controller
                     'avatar' => null, // TODO: Add avatar URL logic
                     'active_status' => true, // TODO: Add real-time check
                     'email' => $user->email,
+                    'type' => 'user',
                 ];
             });
 
-        return response()->json($users);
+        // Search clients
+        $clients = Clients::where(function ($q) use ($query) {
+                $q->where('companyName', 'LIKE', "%{$query}%")
+                    ->orWhere('contactPerson', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%");
+            })->get()->map(function ($client) {
+                return [
+                    'id' => $client->id,
+                    'name' => $client->companyName . ' (' . $client->contactPerson . ')',
+                    'avatar' => null,
+                    'active_status' => true,
+                    'email' => $client->email,
+                    'type' => 'client',
+                ];
+            });
+
+        // Combine users and clients
+        $contacts = $users->concat($clients);
+
+        return response()->json($contacts);
     }
 }

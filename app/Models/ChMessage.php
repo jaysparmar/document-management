@@ -16,6 +16,8 @@ class ChMessage extends Model
         'attachment',
         'attachment_url',
         'created_at',
+        'from_type',
+        'to_type',
     ];
 
     public $incrementing = false; // Because you're using UUIDs

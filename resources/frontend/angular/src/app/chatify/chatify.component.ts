@@ -90,15 +90,15 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
 
   selectUser(user: any): void {
     this.selectedUser = user;
-    this.loadMessages(user.id);
+    this.loadMessages(user.id, user.type || 'user');
 
     // Subscribe to the selected user's channel for real-time messages
     this.chatifyService.subscribeToUser(user.id);
   }
 
-  loadMessages(userId: string): void {
+  loadMessages(userId: string, userType: string = 'user'): void {
     this.loading = true;
-    this.sub$.sink = this.chatifyService.getMessages(userId)
+    this.sub$.sink = this.chatifyService.getMessages(userId, userType)
       .subscribe(
         (response: any) => {
           this.messages = response.messages;
@@ -118,9 +118,10 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
 
     const message = this.messageForm.get('message').value;
     const attachment = this.messageForm.get('attachment').value;
+    const userType = this.selectedUser.type || 'user';
 
     this.loading = true;
-    this.sub$.sink = this.chatifyService.sendMessage(message, this.selectedUser.id, attachment)
+    this.sub$.sink = this.chatifyService.sendMessage(message, this.selectedUser.id, attachment, userType)
       .subscribe(
         (response: any) => {
           this.messages.push(response.message);

@@ -93,23 +93,23 @@ export class ChatifyService {
   }
 
   /**
-   * Get all messages for a specific user
+   * Get all messages for a specific user or client
    */
-  getMessages(userId: string): Observable<any | CommonError> {
+  getMessages(userId: string, userType: string = 'user'): Observable<any | CommonError> {
     const url = `chatify/fetchMessages`;
-    const params = new HttpParams().set('id', userId);
-    return this.httpClient.post<any>(url, { id: userId })
+    return this.httpClient.post<any>(url, { id: userId, type: userType })
       .pipe(catchError(error => this.commonHttpErrorService.handleError(error)));
   }
 
   /**
-   * Send a message to a user
+   * Send a message to a user or client
    */
-  sendMessage(message: string, userId: string, attachment: File | null = null): Observable<any | CommonError> {
+  sendMessage(message: string, userId: string, attachment: File | null = null, userType: string = 'user'): Observable<any | CommonError> {
     const url = `chatify/sendMessage`;
     const formData = new FormData();
     formData.append('message', message);
     formData.append('id', userId);
+    formData.append('type', userType);
 
     if (attachment) {
       formData.append('file', attachment);
