@@ -48,6 +48,11 @@ Route::prefix('client-portal')->name('client-portal.')->middleware(['auth:client
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('documents/view-document', [DocumentController::class, 'viewDocument'])->name('documents.view');
 
+    // Meeting routes
+    Route::get('meetings', [App\Http\Controllers\Client\MeetingController::class, 'index'])->name('meetings.index');
+    Route::get('meetings/{id}', [App\Http\Controllers\Client\MeetingController::class, 'show'])->name('meetings.show');
+    Route::post('meetings/{id}/accept', [App\Http\Controllers\Client\MeetingController::class, 'accept'])->name('meetings.accept');
+
     // Client Chat Routes
     Route::prefix('chat')->group(function () {
         Route::get('/contacts', [App\Http\Controllers\ClientChatController::class, 'getContacts'])->name('chat.contacts');

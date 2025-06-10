@@ -30,6 +30,17 @@
                 </a>
             </li>
 
+            {{-- Meetings --}}
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {{ Request::is('client-portal/meetings*') ? 'active' : '' }}"
+                   href="{{ route('client-portal.meetings.index') }}">
+                    <div class="icon-wrapper me-2 {{ Request::is('client-portal/meetings*') ? 'active-icon' : '' }}">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <span class="nav-link-text">Meetings</span>
+                </a>
+            </li>
+
             {{-- Upload Document
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ Request::is('client-portal/documents/create') ? 'active' : '' }}"
@@ -58,4 +69,3 @@
         </ul>
     </div>
 </aside>
-

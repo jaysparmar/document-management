@@ -57,7 +57,7 @@ class Meeting extends Model
         return $this->belongsToMany(Clients::class, 'meeting_clients', 'meeting_id', 'client_id')
                     ->using(MeetingClient::class)
                     ->withPivot('is_accepted')
-                    ->withTimestamps();
+                    ->withTimestamps('created_at', 'updated_at');
     }
 
     /**

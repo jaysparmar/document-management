@@ -64,7 +64,7 @@ class Clients extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_clients', 'client_id', 'meeting_id')
                     ->using(MeetingClient::class)
                     ->withPivot('is_accepted')
-                    ->withTimestamps();
+                    ->withTimestamps('created_at', 'updated_at');
     }
 
     protected static function boot()
