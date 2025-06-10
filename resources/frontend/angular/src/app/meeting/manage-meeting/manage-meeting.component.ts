@@ -3,12 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meeting } from '@core/domain-classes/meeting';
 import { User } from '@core/domain-classes/user';
+import { Client } from '@core/domain-classes/client';
 import { SecurityService } from '@core/security/security.service';
 import { CommonService } from '@core/services/common.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { BaseComponent } from 'src/app/base.component';
 import { MeetingService } from '../meeting.service';
+import { ClientService } from 'src/app/client/client.service';
 
 @Component({
   selector: 'app-manage-meeting',
@@ -21,6 +23,7 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
   meetingId: string;
   loading = false;
   users: User[] = [];
+  clients: Client[] = [];
   meetingLink: string = '';
 
   constructor(
@@ -31,7 +34,8 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
     private translateService: TranslateService,
     private toastrService: ToastrService,
     private securityService: SecurityService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private clientService: ClientService
   ) {
     super();
   }
@@ -39,6 +43,7 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
   ngOnInit(): void {
     this.createMeetingForm();
     this.getUsers();
+    this.getClients();
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.meetingId = params['id'];
@@ -69,13 +74,28 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
     );
   }
 
+  getClients(): void {
+    this.loading = true;
+    this.sub$.sink = this.clientService.getClients().subscribe(
+      (data: Client[]) => {
+        this.clients = data;
+        this.loading = false;
+      },
+      (error) => {
+        this.loading = false;
+        this.toastrService.error(this.translateService.instant('ERROR_LOADING_CLIENTS'));
+      }
+    );
+  }
+
   createMeetingForm() {
     this.meetingForm = this.fb.group({
       title: ['', [Validators.required]],
       description: [''],
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
-      userIds: [[]]
+      userIds: [[]],
+      clientIds: [[]]
     });
   }
 
@@ -90,6 +110,12 @@ export class ManageMeetingComponent extends BaseComponent implements OnInit {
           if (meeting.users && meeting.users.length > 0) {
             const userIds = meeting.users.map(user => user.id);
             this.meetingForm.get('userIds').setValue(userIds);
+          }
+
+          // Set selected clients if available
+          if (meeting.clients && meeting.clients.length > 0) {
+            const clientIds = meeting.clients.map(client => client.id);
+            this.meetingForm.get('clientIds').setValue(clientIds);
           }
 
           // Generate meeting link

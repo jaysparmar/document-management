@@ -55,7 +55,9 @@ class MeetingController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'user_ids' => 'nullable|array',
-            'user_ids.*' => 'exists:users,id'
+            'user_ids.*' => 'exists:users,id',
+            'client_ids' => 'nullable|array',
+            'client_ids.*' => 'exists:clients,id'
         ]);
 
         if ($validator->fails()) {
@@ -97,7 +99,9 @@ class MeetingController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'user_ids' => 'nullable|array',
-            'user_ids.*' => 'exists:users,id'
+            'user_ids.*' => 'exists:users,id',
+            'client_ids' => 'nullable|array',
+            'client_ids.*' => 'exists:clients,id'
         ]);
 
         if ($validator->fails()) {
@@ -116,7 +120,7 @@ class MeetingController extends Controller
         $meeting->start_time = $request->start_time;
         $meeting->end_time = $request->end_time;
 
-        return response()->json($this->meetingRepository->updateMeeting($meeting, $id, $request->user_ids ?? []));
+        return response()->json($this->meetingRepository->updateMeeting($meeting, $id, $request->user_ids ?? [], $request->client_ids ?? []));
     }
 
     /**
@@ -188,7 +192,57 @@ class MeetingController extends Controller
     }
 
     /**
+     * Add clients to a meeting.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function addClients(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'client_ids' => 'required|array',
+            'client_ids.*' => 'exists:clients,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 422);
+        }
+
+        $meeting = Meeting::findOrFail($id);
+
+        // Check if user is authorized to add clients to the meeting
+        if ($meeting->created_by !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($this->meetingRepository->addClientsToMeeting($id, $request->client_ids));
+    }
+
+    /**
+     * Remove a client from a meeting.
+     *
+     * @param  string  $meetingId
+     * @param  string  $clientId
+     * @return \Illuminate\Http\Response
+     */
+    public function removeClient($meetingId, $clientId)
+    {
+        $meeting = Meeting::findOrFail($meetingId);
+
+        // Check if user is authorized to remove clients from the meeting
+        if ($meeting->created_by !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($this->meetingRepository->removeClientFromMeeting($meetingId, $clientId));
+    }
+
+    /**
      * Accept a meeting invitation.
+     *
+     * Note: This method is kept for backward compatibility but is no longer needed
+     * as all invitations are now automatically accepted.
      *
      * @param  string  $id
      * @return \Illuminate\Http\Response
@@ -203,7 +257,8 @@ class MeetingController extends Controller
             return response()->json(['message' => 'You are not invited to this meeting'], 403);
         }
 
-        return response()->json($this->meetingRepository->acceptMeetingInvitation($id, $userId));
+        // All invitations are now automatically accepted, so just return the meeting
+        return response()->json($meeting);
     }
 
     /**
@@ -217,42 +272,79 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($id);
         $userId = Auth::id();
 
-        // Check if user is the creator or an invited user who has accepted
+        // Check if user is the creator or an invited user or client
         $isCreator = $meeting->created_by === $userId;
-        $isAcceptedParticipant = $meeting->users()
+        $isParticipant = $meeting->users()
             ->where('user_id', $userId)
-            ->where('is_accepted', true)
             ->exists();
 
-        if (!$isCreator && !$isAcceptedParticipant) {
+        // If this is a client accessing the meeting
+        $isClient = false;
+        if (Auth::guard('client')->check()) {
+            $clientId = Auth::guard('client')->id();
+            $isClient = $meeting->clients()
+                ->where('client_id', $clientId)
+                ->exists();
+        }
+
+        if (!$isCreator && !$isParticipant && !$isClient) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $user = Auth::user();
-        $displayName = $user->firstName . ' ' . $user->lastName;
+        // Get display name based on whether it's a user or client
+        if (Auth::guard('client')->check()) {
+            $client = Auth::guard('client')->user();
+            $displayName = $client->contactPerson;
+        } else {
+            $user = Auth::user();
+            $displayName = $user->firstName . ' ' . $user->lastName;
+        }
 
         // Get Jitsi meeting configuration
+        $configData = [
+            'startTime' => $meeting->start_time,
+            'endTime' => $meeting->end_time
+        ];
+
+        if (Auth::guard('client')->check()) {
+            $client = Auth::guard('client')->user();
+            $configData['clientId'] = $client->id;
+            $configData['email'] = $client->email;
+        } else {
+            $user = Auth::user();
+            $configData['userId'] = $user->id;
+            $configData['email'] = $user->email;
+        }
+
         $jitsiConfig = $this->jitsiService->getMeetingConfig(
             $meeting->jitsi_meeting_id,
             $meeting->title,
             $displayName,
-            [
-                'userId' => $user->id,
-                'email' => $user->email,
-                'startTime' => $meeting->start_time,
-                'endTime' => $meeting->end_time
-            ]
+            $configData
         );
 
 
 
-        return response()->json([
+        $responseData = [
             'meeting_id' => $meeting->jitsi_meeting_id,
             'room_name' => $meeting->title,
             'display_name' => $displayName,
             'start_time' => $meeting->start_time,
             'end_time' => $meeting->end_time,
             'jitsi_config' => $jitsiConfig
-        ]);
+        ];
+
+        // Add participant type and ID
+        if (Auth::guard('client')->check()) {
+            $client = Auth::guard('client')->user();
+            $responseData['participant_type'] = 'client';
+            $responseData['participant_id'] = $client->id;
+        } else {
+            $user = Auth::user();
+            $responseData['participant_type'] = 'user';
+            $responseData['participant_id'] = $user->id;
+        }
+
+        return response()->json($responseData);
     }
 }

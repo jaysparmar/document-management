@@ -445,6 +445,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/meetings/{id}', [MeetingController::class, 'destroy']);
     Route::post('/meetings/{id}/users', [MeetingController::class, 'addUsers']);
     Route::delete('/meetings/{meetingId}/users/{userId}', [MeetingController::class, 'removeUser']);
+    Route::post('/meetings/{id}/clients', [MeetingController::class, 'addClients']);
+    Route::delete('/meetings/{meetingId}/clients/{clientId}', [MeetingController::class, 'removeClient']);
     Route::post('/meetings/{id}/accept', [MeetingController::class, 'acceptInvitation']);
     Route::get('/meetings/{id}/jitsi', [MeetingController::class, 'getJitsiInfo']);
 });

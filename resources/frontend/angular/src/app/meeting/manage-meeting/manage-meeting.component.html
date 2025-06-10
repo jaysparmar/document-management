@@ -82,6 +82,36 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="clientIds">{{ 'CLIENT_PARTICIPANTS' | translate }}</label>
+                <ng-select
+                  [items]="clients"
+                  bindLabel="email"
+                  bindValue="id"
+                  [multiple]="true"
+                  [searchable]="true"
+                  placeholder="{{ 'SELECT_CLIENT_PARTICIPANTS' | translate }}"
+                  formControlName="clientIds"
+                  id="clientIds"
+                  class="mdc-menu-surface-open"
+                >
+                  <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                    <span class="ng-value-label">
+                      {{ item.companyName }} - {{ item.contactPerson }} ({{ item.email }})
+                    </span>
+                    <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.companyName }} - {{ item.contactPerson }} ({{ item.email }})
+                  </ng-template>
+                </ng-select>
+                <small class="form-text text-muted">{{ 'CLIENT_PARTICIPANTS_HELP_TEXT' | translate }}</small>
+              </div>
+            </div>
+          </div>
+
           <!-- Meeting Link Section (visible whenever a link is available) -->
           <div class="row mt-3" *ngIf="meetingLink">
             <div class="col-md-12">

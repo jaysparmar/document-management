@@ -50,6 +50,17 @@ class Meeting extends Model
     }
 
     /**
+     * Get the clients attending the meeting.
+     */
+    public function clients()
+    {
+        return $this->belongsToMany(Clients::class, 'meeting_clients', 'meeting_id', 'client_id')
+                    ->using(MeetingClient::class)
+                    ->withPivot('is_accepted')
+                    ->withTimestamps();
+    }
+
+    /**
      * Boot function to add global scope and UUID generation
      */
     protected static function boot()

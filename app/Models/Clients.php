@@ -56,6 +56,17 @@ class Clients extends Authenticatable
         return $this->documents()->where('status', 'approved');
     }
 
+    /**
+     * Get the meetings that the client is attending.
+     */
+    public function meetings()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_clients', 'client_id', 'meeting_id')
+                    ->using(MeetingClient::class)
+                    ->withPivot('is_accepted')
+                    ->withTimestamps();
+    }
+
     protected static function boot()
     {
         parent::boot();

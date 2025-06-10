@@ -9,6 +9,7 @@ export interface Meeting {
     isDeleted?: boolean;
     creator?: any;
     users?: any[];
+    clients?: any[];
 
     // Keep snake_case properties for backward compatibility
     start_time?: Date;

@@ -139,6 +139,25 @@ export class MeetingService {
       );
   }
 
+  addClientsToMeeting(meetingId: string, clientIds: string[]): Observable<Meeting | CommonError> {
+    const url = `meetings/${meetingId}/clients`;
+    // Keep using snake_case for API request
+    return this.httpClient.post<any>(url, { client_ids: clientIds })
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
+  }
+
+  removeClientFromMeeting(meetingId: string, clientId: string): Observable<Meeting | CommonError> {
+    const url = `meetings/${meetingId}/clients/${clientId}`;
+    return this.httpClient.delete<any>(url)
+      .pipe(
+        map(data => this.toCamelCase(data) as Meeting),
+        catchError(this.commonHttpErrorService.handleError)
+      );
+  }
+
   acceptMeetingInvitation(meetingId: string): Observable<Meeting | CommonError> {
     const url = `meetings/${meetingId}/accept`;
     return this.httpClient.post<any>(url, {})

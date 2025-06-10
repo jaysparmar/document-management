@@ -4,7 +4,9 @@ namespace App\Repositories\Implementation;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\MeetingClient;
 use App\Models\Users;
+use App\Models\Clients;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Implementation\BaseRepository;
 use App\Repositories\Contracts\MeetingRepositoryInterface;
@@ -58,8 +60,24 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
                         $meetingUser->id = Uuid::uuid4()->toString();
                         $meetingUser->meeting_id = $model->id;
                         $meetingUser->user_id = $userId;
-                        $meetingUser->is_accepted = false;
+                        $meetingUser->is_accepted = true; // Direct acceptance
                         $meetingUser->save();
+                    }
+                }
+            }
+
+            // Add clients to the meeting
+            if (isset($attributes['client_ids']) && is_array($attributes['client_ids'])) {
+                foreach ($attributes['client_ids'] as $clientId) {
+                    // Check if client is already in the meeting
+                    if (!$model->clients()->where('client_id', $clientId)->exists()) {
+                        // Create a new MeetingClient instance with UUID
+                        $meetingClient = new MeetingClient();
+                        $meetingClient->id = Uuid::uuid4()->toString();
+                        $meetingClient->meeting_id = $model->id;
+                        $meetingClient->client_id = $clientId;
+                        $meetingClient->is_accepted = true; // Direct acceptance
+                        $meetingClient->save();
                     }
                 }
             }
@@ -76,12 +94,12 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
 
     public function findMeeting($id)
     {
-        $model = $this->model->with('users')->with('creator')->findOrFail($id);
+        $model = $this->model->with('users')->with('clients')->with('creator')->findOrFail($id);
         $this->resetModel();
         return $this->parseResult($model);
     }
 
-    public function updateMeeting($model, $id, array $userIds)
+    public function updateMeeting($model, $id, array $userIds, array $clientIds = [])
     {
         try {
             DB::beginTransaction();
@@ -91,7 +109,7 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
             $this->resetModel();
             $result = $this->parseResult($model);
 
-            // Update meeting participants
+            // Update meeting participants (users)
             if (is_array($userIds)) {
                 $meeting = Meeting::findOrFail($id);
 
@@ -111,8 +129,34 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
                         $meetingUser->id = Uuid::uuid4()->toString();
                         $meetingUser->meeting_id = $meeting->id;
                         $meetingUser->user_id = $userId;
-                        $meetingUser->is_accepted = false;
+                        $meetingUser->is_accepted = true; // Direct acceptance
                         $meetingUser->save();
+                    }
+                }
+            }
+
+            // Update meeting participants (clients)
+            if (is_array($clientIds)) {
+                $meeting = Meeting::findOrFail($id);
+
+                // First, remove clients that are not in the array
+                $existingClientIds = $meeting->clients()->pluck('client_id')->toArray();
+                $clientIdsToRemove = array_diff($existingClientIds, $clientIds);
+
+                foreach ($clientIdsToRemove as $clientId) {
+                    $meeting->clients()->detach($clientId);
+                }
+
+                // Then, add new clients with UUID
+                foreach ($clientIds as $clientId) {
+                    if (!$meeting->clients()->where('client_id', $clientId)->exists()) {
+                        // Create a new MeetingClient instance with UUID
+                        $meetingClient = new MeetingClient();
+                        $meetingClient->id = Uuid::uuid4()->toString();
+                        $meetingClient->meeting_id = $meeting->id;
+                        $meetingClient->client_id = $clientId;
+                        $meetingClient->is_accepted = true; // Direct acceptance
+                        $meetingClient->save();
                     }
                 }
             }
@@ -140,7 +184,7 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
                     $meetingUser->id = Uuid::uuid4()->toString();
                     $meetingUser->meeting_id = $meeting->id;
                     $meetingUser->user_id = $userId;
-                    $meetingUser->is_accepted = false;
+                    $meetingUser->is_accepted = true; // Direct acceptance
                     $meetingUser->save();
                 }
             }
@@ -149,6 +193,62 @@ class MeetingRepository extends BaseRepository implements MeetingRepositoryInter
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error adding users to meeting: ' . $e->getMessage(),
+            ], 409);
+        }
+    }
+
+    public function addClientsToMeeting($meetingId, array $clientIds)
+    {
+        try {
+            $meeting = Meeting::findOrFail($meetingId);
+
+            foreach ($clientIds as $clientId) {
+                // Check if client is already in the meeting
+                if (!$meeting->clients()->where('client_id', $clientId)->exists()) {
+                    // Create a new MeetingClient instance with UUID
+                    $meetingClient = new MeetingClient();
+                    $meetingClient->id = Uuid::uuid4()->toString();
+                    $meetingClient->meeting_id = $meeting->id;
+                    $meetingClient->client_id = $clientId;
+                    $meetingClient->is_accepted = true; // Direct acceptance
+                    $meetingClient->save();
+                }
+            }
+
+            return $meeting;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error adding clients to meeting: ' . $e->getMessage(),
+            ], 409);
+        }
+    }
+
+    public function removeClientFromMeeting($meetingId, $clientId)
+    {
+        try {
+            $meeting = Meeting::findOrFail($meetingId);
+            $meeting->clients()->detach($clientId);
+
+            return $meeting;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error removing client from meeting: ' . $e->getMessage(),
+            ], 409);
+        }
+    }
+
+    public function acceptClientMeetingInvitation($meetingId, $clientId)
+    {
+        try {
+            $meeting = Meeting::findOrFail($meetingId);
+
+            // Update the pivot table to mark the invitation as accepted
+            $meeting->clients()->updateExistingPivot($clientId, ['is_accepted' => true]);
+
+            return $meeting;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error accepting client meeting invitation: ' . $e->getMessage(),
             ], 409);
         }
     }
