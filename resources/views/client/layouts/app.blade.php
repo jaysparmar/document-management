@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="client-id" content="{{ $client->id ?? '' }}">
 
     <title>@yield('title', 'Client Portal') | Client Management</title>
 
@@ -15,6 +17,7 @@
     <link href="{{ asset('assets/client/css/nucleo-svg.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/client/css/toastr.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/client/css/custom.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/client/css/chat-popup.css') }}" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
 
     <!-- Main CSS -->
@@ -37,6 +40,9 @@
         </div>
 
         @include('client.partials.footer')
+
+        <!-- Chat Popup -->
+        @include('client.partials.chat-popup')
     </main>
 
     <!-- Core JS Files -->
@@ -62,6 +68,7 @@
     <!-- Custom JS -->
     <script src="{{ asset('assets/client/js/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/client/js/custom.js') }}"></script>
+    <script src="{{ asset('assets/client/js/chat-popup.js') }}"></script>
 
     @stack('scripts')
 </body>
