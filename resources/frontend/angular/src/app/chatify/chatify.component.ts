@@ -36,37 +36,35 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
     this.currentUser = this.securityService.getUserDetail();
     this.loadContacts();
 
-    // Subscribe to real-time message updates
+    // Subscribe to message updates from polling
     this.sub$.sink = this.chatifyService.getMessageReceived()
       .subscribe(data => {
-        // Check if we have a selected user and the message is from that user
-        if (this.selectedUser && data.message &&
-            (data.message.from_id === this.selectedUser.id || data.message.to_id === this.selectedUser.id)) {
-          // Add the message to the messages array
-          this.messages.push(data.message);
+        if (this.selectedUser && data.messages && data.messages.length > 0) {
+          // Check if user is at bottom of chat before appending messages
+          const messagesContainer = document.querySelector('.messages-container');
+          const isAtBottom = messagesContainer ?
+            (messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 50) :
+            true;
 
-          // Scroll to the bottom of the messages container
-          setTimeout(() => {
-            const messagesContainer = document.querySelector('.messages-container');
-            if (messagesContainer) {
-              messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-          }, 100);
+          // Append new messages to the messages array
+          this.messages = [...this.messages, ...data.messages];
+
+          // Only scroll to bottom if user was already at the bottom
+          if (isAtBottom) {
+            setTimeout(() => {
+              if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+              }
+            }, 100);
+          }
         }
       });
 
-    // Subscribe to real-time user status updates
-    this.sub$.sink = this.chatifyService.getUserStatusChanged()
-      .subscribe(data => {
-        const contactIndex = this.contacts.findIndex(contact => contact.id === data.id);
-        if (contactIndex !== -1) {
-          this.contacts[contactIndex].active_status = data.status;
-
-          // Update selected user status if it's the same user
-          if (this.selectedUser && this.selectedUser.id === data.id) {
-            this.selectedUser.active_status = data.status;
-          }
-        }
+    // Subscribe to unread count updates
+    this.sub$.sink = this.chatifyService.getUnreadCountChanged()
+      .subscribe(count => {
+        // Handle unread count updates if needed
+        console.log('Unread messages:', count);
       });
   }
   log(data: any): void {
@@ -92,8 +90,20 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
     this.selectedUser = user;
     this.loadMessages(user.id, user.type || 'user');
 
-    // Subscribe to the selected user's channel for real-time messages
-    this.chatifyService.subscribeToUser(user.id);
+    // Start polling for new messages with this user
+    this.chatifyService.startPolling(user.id, user.type || 'user');
+  }
+
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    // Stop polling when component is destroyed
+    this.chatifyService.stopPolling();
+  }
+
+  refreshMessages(): void {
+    if (this.selectedUser) {
+      this.loadMessages(this.selectedUser.id, this.selectedUser.type || 'user');
+    }
   }
 
   loadMessages(userId: string, userType: string = 'user'): void {

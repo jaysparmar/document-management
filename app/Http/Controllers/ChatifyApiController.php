@@ -75,9 +75,96 @@ class ChatifyApiController extends Controller
             return $message;
         });
 
+        // Mark messages from the other user as read
+        $this->markMessagesAsRead($authId, $authType, $userId, $userType);
+
         return response()->json([
             'messages' => $messages,
         ]);
+    }
+
+    /**
+     * Fetch only new messages since a given timestamp.
+     */
+    public function fetchNewMessages(Request $request)
+    {
+        $userId = $request->input('id');
+        $userType = $request->input('type', 'user'); // Default to 'user' if not provided
+        $since = $request->input('since'); // Timestamp of the last message received
+        $authId = Auth::id();
+        $authType = 'user'; // Current authenticated user is always a user
+
+        $query = ChMessage::where(function ($q) use ($authId, $userId, $authType, $userType) {
+            $q->where('from_id', $authId)
+              ->where('from_type', $authType)
+              ->where('to_id', $userId)
+              ->where('to_type', $userType);
+        })->orWhere(function ($q) use ($authId, $userId, $authType, $userType) {
+            $q->where('from_id', $userId)
+              ->where('from_type', $userType)
+              ->where('to_id', $authId)
+              ->where('to_type', $authType);
+        });
+
+        // If since parameter is provided, only get messages after that timestamp
+        if ($since) {
+            $query->where('created_at', '>', $since);
+        }
+
+        $messages = $query->orderBy('created_at', 'asc')->get();
+
+        // Add isMine flag to each message
+        $messages = $messages->map(function ($message) use ($authId, $authType) {
+            $message->isMine = $message->from_id === $authId && $message->from_type === $authType;
+            return $message;
+        });
+
+        // Mark messages from the other user as read
+        $this->markMessagesAsRead($authId, $authType, $userId, $userType);
+
+        // Count unread messages (messages to the authenticated user that haven't been read)
+        $unreadCount = ChMessage::where('to_id', $authId)
+            ->where('to_type', $authType)
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json([
+            'messages' => $messages,
+            'unread_count' => $unreadCount
+        ]);
+    }
+
+    /**
+     * Get count of unread messages for the authenticated user.
+     */
+    public function getUnreadCount(Request $request)
+    {
+        $authId = Auth::id();
+        $authType = 'user'; // Current authenticated user is always a user
+
+        // Count unread messages (messages to the authenticated user that haven't been read)
+        $unreadCount = ChMessage::where('to_id', $authId)
+            ->where('to_type', $authType)
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json([
+            'unread_count' => $unreadCount
+        ]);
+    }
+
+    /**
+     * Mark messages as read.
+     */
+    private function markMessagesAsRead($toId, $toType, $fromId, $fromType)
+    {
+        // Mark all messages from the other user to the authenticated user as read
+        ChMessage::where('from_id', $fromId)
+            ->where('from_type', $fromType)
+            ->where('to_id', $toId)
+            ->where('to_type', $toType)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
 
     /**

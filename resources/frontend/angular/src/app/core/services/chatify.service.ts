@@ -1,76 +1,83 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, interval } from 'rxjs';
 import { CommonError } from '@core/error-handler/common-error';
 import { CommonHttpErrorService } from '@core/error-handler/common-http-error.service';
-import { catchError } from 'rxjs/operators';
-import Pusher from 'pusher-js';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatifyService {
-  private pusher: Pusher;
-  private channel: any;
   private messageReceived = new Subject<any>();
-  private userStatusChanged = new Subject<any>();
+  private unreadCountChanged = new Subject<number>();
+  private pollingInterval = 2000; // 2 seconds
+  private selectedUserId: string | null = null;
+  private selectedUserType: string = 'user';
+  private lastMessageTimestamp: string | null = null;
 
   constructor(
     private httpClient: HttpClient,
     private commonHttpErrorService: CommonHttpErrorService
-  ) {
-    // Initialize Pusher
-    this.initializePusher();
-  }
+  ) {}
 
-  private getCSRFToken(): string {
-    const tokenElement = document.querySelector('meta[name="csrf-token"]');
-    return tokenElement ? tokenElement.getAttribute('content') : '';
-  }
+  // Start polling for new messages
+  startPolling(userId: string, userType: string = 'user'): void {
+    this.selectedUserId = userId;
+    this.selectedUserType = userType;
+    this.lastMessageTimestamp = null;
 
-  private initializePusher(): void {
-    // Get Pusher credentials from environment
-    const token = localStorage.getItem('bearerToken');
-    this.pusher = new Pusher('2d9254cb3b57b0552c02', {
-      cluster: 'ap1',
-      forceTLS: true,
-      authEndpoint: '/chatify/auth',
-      auth: {
-        headers: {
-          'X-CSRF-Token': this.getCSRFToken(),
-          'X-Requested-With': 'XMLHttpRequest',
-          'Authorization': 'Bearer ' + token
+    // Set up polling interval
+    interval(this.pollingInterval)
+      .pipe(
+        switchMap(() => this.fetchNewMessages(userId, userType, this.lastMessageTimestamp))
+      )
+      .subscribe(
+        (response: any) => {
+          // If there are new messages, update the last message timestamp
+          if (response.messages && response.messages.length > 0) {
+            const lastMessage = response.messages[response.messages.length - 1];
+            this.lastMessageTimestamp = lastMessage.created_at;
+
+            // Emit the new messages
+            this.messageReceived.next({
+              messages: response.messages
+            });
+          }
+
+          // Update unread count
+          this.unreadCountChanged.next(response.unread_count);
+        },
+        error => {
+          console.error('Error polling for new messages:', error);
         }
-      }
-    });
-
-    // Subscribe to presence channel for online/offline status
-    const presenceChannel = this.pusher.subscribe('presence-activeStatus');
-
-    presenceChannel.bind('pusher:member_added', (member) => {
-      this.userStatusChanged.next({ id: member.id, status: true });
-    });
-
-    presenceChannel.bind('pusher:member_removed', (member) => {
-      this.userStatusChanged.next({ id: member.id, status: false });
-    });
+      );
   }
 
-  // Subscribe to a specific user's channel
-  subscribeToUser(userId: string): void {
-    // Unsubscribe from previous channel if exists
-    if (this.channel) {
-      this.pusher.unsubscribe(this.channel.name);
+  // Stop polling
+  stopPolling(): void {
+    this.selectedUserId = null;
+    this.lastMessageTimestamp = null;
+  }
+
+  // Fetch new messages since a given timestamp
+  fetchNewMessages(userId: string, userType: string = 'user', since: string | null = null): Observable<any | CommonError> {
+    const url = `chatify/fetchNewMessages`;
+    const body: any = { id: userId, type: userType };
+
+    if (since) {
+      body.since = since;
     }
 
-    // Subscribe to the new channel
-    const channelName = 'private-chatify.' + userId;
-    this.channel = this.pusher.subscribe(channelName);
+    return this.httpClient.post<any>(url, body)
+      .pipe(catchError(error => this.commonHttpErrorService.handleError(error)));
+  }
 
-    // Listen for new messages
-    this.channel.bind('messaging', (data) => {
-      this.messageReceived.next(data);
-    });
+  // Get unread count
+  getUnreadCount(): Observable<any | CommonError> {
+    const url = `chatify/getUnreadCount`;
+    return this.httpClient.get<any>(url)
+      .pipe(catchError(error => this.commonHttpErrorService.handleError(error)));
   }
 
   // Get message received observable
@@ -78,9 +85,9 @@ export class ChatifyService {
     return this.messageReceived.asObservable();
   }
 
-  // Get user status changed observable
-  getUserStatusChanged(): Observable<any> {
-    return this.userStatusChanged.asObservable();
+  // Get unread count changed observable
+  getUnreadCountChanged(): Observable<number> {
+    return this.unreadCountChanged.asObservable();
   }
 
   /**
