@@ -30,7 +30,6 @@ class ClientChatController extends Controller
                 'id' => $user->id,
                 'name' => $user->firstName . ' ' . $user->lastName,
                 'avatar' => null,
-                'active_status' => true, // TODO: Add real-time online check
                 'email' => $user->email,
                 'type' => 'user',
             ];
@@ -168,7 +167,6 @@ class ClientChatController extends Controller
                     'id' => $user->id,
                     'name' => $user->firstName . ' ' . $user->lastName,
                     'avatar' => null,
-                    'active_status' => true,
                     'email' => $user->email,
                     'type' => 'user',
                 ];

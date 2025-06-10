@@ -32,7 +32,6 @@
                  (click)="selectUser(contact)">
               <div class="contact-avatar">
                 <img [src]="contact.avatar || 'assets/images/user.jpg'" [alt]="contact.name">
-                <span class="status-badge" [class.online]="contact.active_status" [class.offline]="!contact.active_status"></span>
               </div>
               <div class="contact-info">
                 <div class="contact-name">
@@ -40,12 +39,6 @@
                   <span *ngIf="contact.type === 'client'" class="contact-type client">
                     ({{ 'CLIENT' | translate }})
                   </span>
-                </div>
-                <div class="contact-status" *ngIf="contact.active_status">
-                  {{ 'ONLINE' | translate }}
-                </div>
-                <div class="contact-status" *ngIf="!contact.active_status">
-                  {{ 'OFFLINE' | translate }}
                 </div>
               </div>
             </div>
@@ -81,14 +74,6 @@
                     ({{ 'CLIENT' | translate }})
                   </span>
                 </h3>
-                <div class="status" *ngIf="selectedUser.active_status">
-                  <span class="status-dot online"></span>
-                  {{ 'ONLINE' | translate }}
-                </div>
-                <div class="status" *ngIf="!selectedUser.active_status">
-                  <span class="status-dot offline"></span>
-                  {{ 'OFFLINE' | translate }}
-                </div>
               </div>
             </div>
           </div>

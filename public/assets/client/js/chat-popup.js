@@ -214,16 +214,12 @@ function renderContacts(contacts) {
                  data-type="${contact.type || 'user'}"
                  onclick="selectUserHandler(this)">
                 <div class="contact-avatar">
-                    <img src="${contact.avatar || '/assets/client/img/user.jpg'}" alt="${contact.name}">
-                    <span class="status-badge ${contact.active_status ? 'online' : 'offline'}"></span>
+                    <img src="${contact.avatar || '/assets/angular/browser/assets/images/user.jpg'}" alt="${contact.name}">
                 </div>
                 <div class="contact-info">
                     <div class="contact-name">
                         ${contact.name}
                         ${contact.type === 'client' ? '<span class="badge bg-info">Client</span>' : ''}
-                    </div>
-                    <div class="contact-status">
-                        ${contact.active_status ? 'Online' : 'Offline'}
                     </div>
                 </div>
             </div>
@@ -258,16 +254,12 @@ window.selectUserHandler = function(element) {
     // Update chat header
     chatHeader.innerHTML = `
         <div class="user-info">
-            <img src="${user.avatar || '/assets/client/img/user.jpg'}" alt="${user.name}">
+            <img src="${user.avatar || '/assets/angular/browser/assets/images/user.jpg'}" alt="${user.name}">
             <div class="user-details">
                 <h3>
                     ${user.name}
                     ${user.type === 'client' ? '<span class="badge bg-info">Client</span>' : ''}
                 </h3>
-                <div class="status">
-                    <span class="status-dot ${user.active_status ? 'online' : 'offline'}"></span>
-                    ${user.active_status ? 'Online' : 'Offline'}
-                </div>
             </div>
         </div>
     `;
@@ -346,14 +338,16 @@ function renderMessages(messages) {
                 </div>
                 ${message.attachment ? `
                     <div class="message-attachment">
-                        <a href="${message.attachment_url}" target="_blank" class="attachment-link">
+                        <a href="${message.attachment_url || '#'}" target="_blank" class="attachment-link">
                             <i class="fas fa-paperclip"></i>
                             ${message.attachment}
                         </a>
-                        ${isImage(message.attachment) ? `
+                        ${isImage(message.attachment) && message.attachment_url ? `
                             <div class="image-preview">
                                 <img src="${message.attachment_url}" alt="Image attachment" class="attachment-image" onerror="handleImageError(this)">
                             </div>
+                        ` : isImage(message.attachment) ? `
+                            <div class="image-error">Image URL not available</div>
                         ` : ''}
                     </div>
                 ` : ''}
@@ -514,6 +508,15 @@ function isImage(filename) {
 
 // Handle image error
 window.handleImageError = function(img) {
+    // Hide the image if it fails to load
     img.style.display = 'none';
-    img.parentNode.innerHTML += '<div class="image-error">Image could not be loaded</div>';
+
+    // Log error for debugging
+    console.error('Failed to load image:', img.src);
+
+    // Show a user-friendly error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'image-error';
+    errorDiv.textContent = 'Image could not be loaded';
+    img.parentNode.appendChild(errorDiv);
 };

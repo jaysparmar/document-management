@@ -25,7 +25,6 @@ class ChatifyApiController extends Controller
                 'id' => $user->id,
                 'name' => $user->firstName . ' ' . $user->lastName,
                 'avatar' => null, // TODO: Add avatar URL logic
-                'active_status' => true, // TODO: Add real-time online check
                 'email' => $user->email,
                 'type' => 'user',
             ];
@@ -37,7 +36,6 @@ class ChatifyApiController extends Controller
                 'id' => $client->id,
                 'name' => $client->companyName . ' (' . $client->contactPerson . ')',
                 'avatar' => null,
-                'active_status' => true,
                 'email' => $client->email,
                 'type' => 'client',
             ];
@@ -203,7 +201,6 @@ class ChatifyApiController extends Controller
                     'id' => $user->id,
                     'name' => $user->firstName . ' ' . $user->lastName,
                     'avatar' => null, // TODO: Add avatar URL logic
-                    'active_status' => true, // TODO: Add real-time check
                     'email' => $user->email,
                     'type' => 'user',
                 ];
@@ -219,7 +216,6 @@ class ChatifyApiController extends Controller
                     'id' => $client->id,
                     'name' => $client->companyName . ' (' . $client->contactPerson . ')',
                     'avatar' => null,
-                    'active_status' => true,
                     'email' => $client->email,
                     'type' => 'client',
                 ];
