@@ -291,7 +291,7 @@ class CompanyProfileRepository extends BaseRepository implements CompanyProfileR
 
             $image = str_replace(' ', '+', $image);
 
-            $destinationPath = public_path() . '/images//';
+            $destinationPath = public_path() . '/images/';
 
             $imageName = Uuid::uuid4() . '.' . $extension;
 

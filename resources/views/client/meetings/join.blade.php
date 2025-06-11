@@ -121,7 +121,6 @@
             // Ensure jitsiConfig exists
             const jitsiConfig = meetingInfo.jitsiConfig || {};
             const domain = jitsiConfig.domain || 'meet.guifi.net';
-            const jwt = jitsiConfig.jwt || null;
 
             const options = {
                 roomName: meetingInfo.meetingId,
