@@ -133,36 +133,37 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
         <body>
             <div class="container">
                 <div class="header">
-                    <h2>Welcome to ' . config('app.name') . '</h2>
+                    <h2>Bienvenue sur ' . config('app.name') . '</h2>
                 </div>
                 <div class="content">
-                    <p>Dear ' . $client->contactPerson . ',</p>
+                    <p>Bonjour ' . $client->contactPerson . ',</p>
 
-                    <p>Your account has been created successfully. Below are your login credentials:</p>
+                    <p>Votre compte a été créé avec succès. Voici vos identifiants de connexion :</p>
 
                     <div class="credentials">
-                        <p><strong>Email:</strong> ' . $client->email . '</p>
-                        <p><strong>Password:</strong> ' . $password . '</p>
+                        <p><strong>Email :</strong> ' . $client->email . '</p>
+                        <p><strong>Mot de passe :</strong> ' . $password . '</p>
                     </div>
 
-                    <p>Please keep this information secure. We recommend changing your password after your first login.</p>
+                    <p>Merci de conserver ces informations en lieu sûr. Nous vous recommandons de changer votre mot de passe lors de votre première connexion.</p>
 
-                    <p>You can access your account by clicking the button below:</p>
+                    <p>Vous pouvez accéder à votre compte en cliquant sur le bouton ci-dessous :</p>
 
-                    <a href="' . $loginUrl . '" class="btn">Login to Your Account</a>
+                    <a href="' . $loginUrl . '" class="btn">Se connecter à votre compte</a>
 
-                    <p>If you have any questions or need assistance, please don\'t hesitate to contact us.</p>
+                    <p>Si vous avez des questions ou besoin d’aide, n’hésitez pas à nous contacter.</p>
 
-                    <p>Thank you for choosing our services!</p>
+                    <p>Merci d’avoir choisi nos services !</p>
 
-                    <p>Best regards,<br>The ' . config('app.name') . ' Team</p>
+                    <p>Cordialement,<br>L’équipe ' . config('app.name') . '</p>
                 </div>
                 <div class="footer">
-                    <p>This is an automated email. Please do not reply to this message.</p>
+                    <p>Ceci est un e-mail automatique. Merci de ne pas répondre à ce message.</p>
                 </div>
             </div>
         </body>
         </html>';
+
 
         // Prepare email data
         $emailData = [
