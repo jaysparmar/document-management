@@ -85,11 +85,13 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
         <html>
         <head>
             <style>
+
                 body {
                     font-family: Arial, sans-serif;
                     line-height: 1.6;
                     color: #333;
                 }
+
                 .container {
                     max-width: 600px;
                     margin: 0 auto;
@@ -97,15 +99,18 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
                     border: 1px solid #ddd;
                     border-radius: 5px;
                 }
+
                 .header {
                     background-color: #f8f9fa;
                     padding: 15px;
                     text-align: center;
                     border-radius: 5px 5px 0 0;
                 }
+
                 .content {
                     padding: 20px;
                 }
+
                 .footer {
                     background-color: #f8f9fa;
                     padding: 15px;
@@ -113,6 +118,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
                     border-radius: 0 0 5px 5px;
                     font-size: 12px;
                 }
+
                 .btn {
                     display: inline-block;
                     padding: 10px 20px;
