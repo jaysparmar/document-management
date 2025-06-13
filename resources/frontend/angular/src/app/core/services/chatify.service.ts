@@ -39,7 +39,8 @@ export class ChatifyService {
     this.selectedUserId = userId;
     this.selectedUserType = userType;
     this.lastMessageTimestamp = null;
-    this.isFirstFetch = true;
+    // Set isFirstFetch to false since messages are already loaded by loadMessages
+    this.isFirstFetch = false;
     this._isPolling = true;
 
     // Set up polling interval
@@ -52,25 +53,20 @@ export class ChatifyService {
           // If there are new messages, update the last message timestamp
           if (response.messages && response.messages.length > 0) {
             const lastMessage = response.messages[response.messages.length - 1];
-            this.lastMessageTimestamp = lastMessage.created_at;
+            this.lastMessageTimestamp = lastMessage.createdAt;
 
-            // Emit messages if it's the first fetch or there are unread messages
-            if (this.isFirstFetch || response.unread_count > 0) {
+            // Only emit messages if there are unread messages (skip first fetch as it's already loaded)
+            if (response.unreadCount > 0) {
               this.messageReceived.next({
                 messages: response.messages
               });
-
-              // After first fetch, set flag to false
-              if (this.isFirstFetch) {
-                this.isFirstFetch = false;
-              }
             }
           }
 
           // Only update unread count if it has changed
-          if (response.unread_count !== this.lastUnreadCount) {
-            this.lastUnreadCount = response.unread_count;
-            this.unreadCountChanged.next(response.unread_count);
+          if (response.unreadCount !== this.lastUnreadCount) {
+            this.lastUnreadCount = response.unreadCount;
+            this.unreadCountChanged.next(response.unreadCount);
           }
         },
         error => {

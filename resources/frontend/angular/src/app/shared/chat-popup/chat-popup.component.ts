@@ -50,7 +50,7 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
             true;
 
           // Append new messages to the messages array
-          this.messages = [...this.messages];
+          this.messages = [...this.messages, ...data.messages];
 
           // Only scroll to bottom if user was already at the bottom
           if (isAtBottom) {
@@ -130,8 +130,7 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
       // Restart polling after a short delay
       setTimeout(() => {
         this.chatifyService.startPolling(this.selectedUser.id, this.selectedUser.type || 'user');
-      this.loading = false;
-        }, 500);
+      }, 500);
     }
   }
 
@@ -143,8 +142,8 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
     this.sub$.sink = this.chatifyService.getMessages(userId, userType)
       .subscribe(
         (response: any) => {
-          this.messages = [];
-
+          this.messages = response.messages;
+          this.loading = false;
 
           // Scroll to the bottom of the messages container
           setTimeout(() => {
@@ -155,7 +154,7 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
           }, 100);
         },
         error => {
-
+          this.loading = false;
           this.toastr.error('Failed to load messages');
         }
       );
