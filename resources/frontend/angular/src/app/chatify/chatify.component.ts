@@ -20,7 +20,7 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
   currentUser: any;
 
   constructor(
-    private chatifyService: ChatifyService,
+    public chatifyService: ChatifyService,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private securityService: SecurityService
@@ -114,7 +114,8 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
       // Restart polling after a short delay
       setTimeout(() => {
         this.chatifyService.startPolling(this.selectedUser.id, this.selectedUser.type || 'user');
-      }, 500);
+      this.loading = false;
+        }, 500);
     }
   }
 
@@ -126,8 +127,8 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
     this.sub$.sink = this.chatifyService.getMessages(userId, userType)
       .subscribe(
         (response: any) => {
-          this.messages = response.messages;
-          this.loading = false;
+          // this.messages = response.messages;
+
 
           // Scroll to the bottom of the messages container
           setTimeout(() => {
@@ -138,7 +139,7 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
           }, 100);
         },
         error => {
-          this.loading = false;
+
           this.toastr.error('Failed to load messages');
         }
       );

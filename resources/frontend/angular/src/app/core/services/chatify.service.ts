@@ -17,6 +17,12 @@ export class ChatifyService {
   private lastMessageTimestamp: string | null = null;
   private isFirstFetch: boolean = true;
   private pollingSubscription: Subscription | null = null;
+  private _isPolling: boolean = false;
+
+  // Public getter for isPolling
+  get isPolling(): boolean {
+    return this._isPolling;
+  }
 
   constructor(
     private httpClient: HttpClient,
@@ -34,11 +40,12 @@ export class ChatifyService {
     this.selectedUserType = userType;
     this.lastMessageTimestamp = null;
     this.isFirstFetch = true;
+    this._isPolling = true;
 
     // Set up polling interval
     this.pollingSubscription = interval(this.pollingInterval)
       .pipe(
-        switchMap(() => this.fetchNewMessages(userId, userType, this.lastMessageTimestamp))
+        switchMap(() => this.fetchNewMessages(userId, userType, this.lastMessageTimestamp, true))
       )
       .subscribe(
         (response: any) => {
@@ -80,12 +87,13 @@ export class ChatifyService {
       this.pollingSubscription = null;
     }
 
+    this._isPolling = false;
     this.selectedUserId = null;
     this.lastMessageTimestamp = null;
   }
 
   // Fetch new messages since a given timestamp
-  fetchNewMessages(userId: string, userType: string = 'user', since: string | null = null): Observable<any | CommonError> {
+  fetchNewMessages(userId: string, userType: string = 'user', since: string | null = null, isPolling: boolean = true): Observable<any | CommonError> {
     const url = `chatify/fetchNewMessages`;
     const body: any = { id: userId, type: userType };
 
