@@ -15,6 +15,7 @@ export class ChatifyService {
   private selectedUserId: string | null = null;
   private selectedUserType: string = 'user';
   private lastMessageTimestamp: string | null = null;
+  private isFirstFetch: boolean = true;
 
   constructor(
     private httpClient: HttpClient,
@@ -28,6 +29,7 @@ export class ChatifyService {
     this.selectedUserId = userId;
     this.selectedUserType = userType;
     this.lastMessageTimestamp = null;
+    this.isFirstFetch = true;
 
     // Set up polling interval
     interval(this.pollingInterval)
@@ -41,10 +43,17 @@ export class ChatifyService {
             const lastMessage = response.messages[response.messages.length - 1];
             this.lastMessageTimestamp = lastMessage.created_at;
 
-            // Emit the new messages
-            this.messageReceived.next({
-              messages: response.messages
-            });
+            // Emit messages if it's the first fetch or there are unread messages
+            if (this.isFirstFetch || response.unread_count > 0) {
+              this.messageReceived.next({
+                messages: response.messages
+              });
+
+              // After first fetch, set flag to false
+              if (this.isFirstFetch) {
+                this.isFirstFetch = false;
+              }
+            }
           }
 
           // Only update unread count if it has changed
