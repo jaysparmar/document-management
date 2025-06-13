@@ -90,8 +90,11 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
     this.selectedUser = user;
     this.loadMessages(user.id, user.type || 'user');
 
-    // Start polling for new messages with this user
-    this.chatifyService.startPolling(user.id, user.type || 'user');
+    // Start polling for new messages with this user after a short delay
+    // This ensures that loadMessages completes before polling starts
+    setTimeout(() => {
+      this.chatifyService.startPolling(user.id, user.type || 'user');
+    }, 500);
   }
 
   override ngOnDestroy(): void {
@@ -102,17 +105,37 @@ export class ChatifyComponent extends BaseComponent implements OnInit, OnDestroy
 
   refreshMessages(): void {
     if (this.selectedUser) {
+      // Stop polling temporarily
+      this.chatifyService.stopPolling();
+
+      // Load messages
       this.loadMessages(this.selectedUser.id, this.selectedUser.type || 'user');
+
+      // Restart polling after a short delay
+      setTimeout(() => {
+        this.chatifyService.startPolling(this.selectedUser.id, this.selectedUser.type || 'user');
+      }, 500);
     }
   }
 
   loadMessages(userId: string, userType: string = 'user'): void {
     this.loading = true;
+    // Clear messages array before loading new messages
+    this.messages = [];
+
     this.sub$.sink = this.chatifyService.getMessages(userId, userType)
       .subscribe(
         (response: any) => {
           this.messages = response.messages;
           this.loading = false;
+
+          // Scroll to the bottom of the messages container
+          setTimeout(() => {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+          }, 100);
         },
         error => {
           this.loading = false;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, Subject, interval } from 'rxjs';
+import { Observable, Subject, interval, Subscription } from 'rxjs';
 import { CommonError } from '@core/error-handler/common-error';
 import { CommonHttpErrorService } from '@core/error-handler/common-http-error.service';
 import { catchError, switchMap } from 'rxjs/operators';
@@ -16,6 +16,7 @@ export class ChatifyService {
   private selectedUserType: string = 'user';
   private lastMessageTimestamp: string | null = null;
   private isFirstFetch: boolean = true;
+  private pollingSubscription: Subscription | null = null;
 
   constructor(
     private httpClient: HttpClient,
@@ -26,13 +27,16 @@ export class ChatifyService {
 
   // Start polling for new messages
   startPolling(userId: string, userType: string = 'user'): void {
+    // Stop any existing polling before starting a new one
+    this.stopPolling();
+
     this.selectedUserId = userId;
     this.selectedUserType = userType;
     this.lastMessageTimestamp = null;
     this.isFirstFetch = true;
 
     // Set up polling interval
-    interval(this.pollingInterval)
+    this.pollingSubscription = interval(this.pollingInterval)
       .pipe(
         switchMap(() => this.fetchNewMessages(userId, userType, this.lastMessageTimestamp))
       )
@@ -70,6 +74,12 @@ export class ChatifyService {
 
   // Stop polling
   stopPolling(): void {
+    // Unsubscribe from the polling subscription if it exists
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = null;
+    }
+
     this.selectedUserId = null;
     this.lastMessageTimestamp = null;
   }

@@ -50,7 +50,7 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
             true;
 
           // Append new messages to the messages array
-          this.messages = [...this.messages, ...data.messages];
+          this.messages = [...this.messages];
 
           // Only scroll to bottom if user was already at the bottom
           if (isAtBottom) {
@@ -106,8 +106,11 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
     this.selectedUser = user;
     this.loadMessages(user.id, user.type || 'user');
 
-    // Start polling for new messages with this user
-    this.chatifyService.startPolling(user.id, user.type || 'user');
+    // Start polling for new messages with this user after a short delay
+    // This ensures that loadMessages completes before polling starts
+    setTimeout(() => {
+      this.chatifyService.startPolling(user.id, user.type || 'user');
+    }, 500);
   }
 
   override ngOnDestroy(): void {
@@ -118,12 +121,24 @@ export class ChatPopupComponent extends BaseComponent implements OnInit, OnDestr
 
   refreshMessages(): void {
     if (this.selectedUser) {
+      // Stop polling temporarily
+      this.chatifyService.stopPolling();
+
+      // Load messages
       this.loadMessages(this.selectedUser.id, this.selectedUser.type || 'user');
+
+      // Restart polling after a short delay
+      setTimeout(() => {
+        this.chatifyService.startPolling(this.selectedUser.id, this.selectedUser.type || 'user');
+      }, 500);
     }
   }
 
   loadMessages(userId: string, userType: string = 'user'): void {
     this.loading = true;
+    // Clear messages array before loading new messages
+    this.messages = [];
+
     this.sub$.sink = this.chatifyService.getMessages(userId, userType)
       .subscribe(
         (response: any) => {
