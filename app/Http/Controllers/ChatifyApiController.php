@@ -93,18 +93,23 @@ class ChatifyApiController extends Controller
         $since = $request->input('since'); // Timestamp of the last message received
         $authId = Auth::id();
         $authType = 'user'; // Current authenticated user is always a user
-
+//        dd("asd");
         $query = ChMessage::where(function ($q) use ($authId, $userId, $authType, $userType) {
-            $q->where('from_id', $authId)
-              ->where('from_type', $authType)
-              ->where('to_id', $userId)
-              ->where('to_type', $userType);
-        })->orWhere(function ($q) use ($authId, $userId, $authType, $userType) {
-            $q->where('from_id', $userId)
-              ->where('from_type', $userType)
-              ->where('to_id', $authId)
-              ->where('to_type', $authType);
+            $q->where(function ($q2) use ($authId, $userId, $authType, $userType) {
+                $q2->where('from_id', $authId)
+                    ->where('from_type', $authType)
+                    ->where('to_id', $userId)
+                    ->where('to_type', $userType)
+                    ->whereNull('read_at');
+            })->orWhere(function ($q2) use ($authId, $userId, $authType, $userType) {
+                $q2->where('from_id', $userId)
+                    ->where('from_type', $userType)
+                    ->where('to_id', $authId)
+                    ->where('to_type', $authType)
+                    ->whereNull('read_at');
+            });
         });
+
 
         // If since parameter is provided, only get messages after that timestamp
         if ($since) {
@@ -130,7 +135,7 @@ class ChatifyApiController extends Controller
 
         return response()->json([
             'messages' => $messages,
-            'unread_count' => $unreadCount
+            'unread_count' => $unreadCount,
         ]);
     }
 

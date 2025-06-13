@@ -220,10 +220,10 @@ function checkUnreadCount() {
     fetch('/client-portal/chat/unread-count')
         .then(response => response.json())
         .then(data => {
-            console.log('Unread count:', data.unread_count);
+            console.log('Unread count:', data.unreadCount);
             // Only update if the count has changed
-            if (data.unread_count !== unreadCount) {
-                updateUnreadCount(data.unread_count);
+            if (data.unreadCount !== unreadCount) {
+                updateUnreadCount(data.unreadCount);
             }
         })
         .catch(error => {
@@ -247,7 +247,8 @@ function updateUnreadCount(count) {
 function checkForNewMessages() {
     if (!selectedUser) return;
 
-    console.log('Checking for new messages with user:', selectedUser.id);
+    console.log('Checking for new messages with user:', selectedUser.id, unreadCount);
+    if (unreadCount === 0) return;
 
     const formData = new FormData();
     formData.append('id', selectedUser.id);
@@ -275,12 +276,12 @@ function checkForNewMessages() {
 
                 // Update the last message timestamp
                 const lastMessage = data.messages[data.messages.length - 1];
-                lastMessageTimestamp = lastMessage.created_at;
+                lastMessageTimestamp = lastMessage.createdAt;
             }
 
             // Only update unread count if there are new unread messages
-            if (data.unread_count !== unreadCount) {
-                updateUnreadCount(data.unread_count);
+            if (data.unreadCount !== unreadCount) {
+                updateUnreadCount(data.unreadCount);
             }
         })
         .catch(error => {
@@ -297,9 +298,10 @@ function appendNewMessages(newMessages) {
     // Add new messages to the messages array
     messages = messages.concat(newMessages);
 
-    // Render all messages only if there are new messages
+    // Instead of rendering all messages, only render the new ones
+    // by appending them to the existing message container
     if (newMessages.length > 0) {
-        renderMessages(messages);
+        appendMessagesToContainer(newMessages);
     }
 }
 
@@ -464,7 +466,7 @@ function loadMessages(userId, userType = 'user') {
             // Update the last message timestamp if there are messages
             if (messages && messages.length > 0) {
                 const lastMessage = messages[messages.length - 1];
-                lastMessageTimestamp = lastMessage.created_at;
+                lastMessageTimestamp = lastMessage.createdAt;
                 console.log('Last message timestamp set to:', lastMessageTimestamp);
             }
         })
@@ -534,6 +536,76 @@ function renderMessages(messages) {
     });
 
     messagesContainer.innerHTML = html;
+
+    // Only scroll to bottom if user was already at the bottom
+    if (isAtBottom) {
+        scrollToBottom();
+    }
+}
+
+// Append only new messages to the container
+function appendMessagesToContainer(newMessages) {
+    if (!newMessages || newMessages.length === 0) return;
+
+    // Create a document fragment to hold the new message elements
+    const fragment = document.createDocumentFragment();
+
+    newMessages.forEach(message => {
+        const isOwnMessage = message.isMine !== undefined ? message.isMine : message.from_id === currentClientId && message.from_type === 'client';
+        const messageClass = isOwnMessage ? 'own-message' : 'other-message';
+
+        // Fix date parsing by handling the microseconds format
+        let time;
+        try {
+            // Replace microseconds with milliseconds (3 digits instead of 6)
+            const fixedDateStr = message.createdAt.replace(/\.\d{6}Z/, (match) => {
+                return '.' + match.substring(1, 4) + 'Z';
+            });
+            time = new Date(fixedDateStr).toLocaleString();
+        } catch (e) {
+            console.error('Error parsing date:', message.createdAt, e);
+            time = 'Unknown date';
+        }
+
+        // Create message element
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${messageClass}`;
+
+        // Set message HTML
+        messageElement.innerHTML = `
+            <div class="message-content">
+                <div class="message-text">${message.body}</div>
+                <div class="message-time">${time}</div>
+            </div>
+            ${message.attachment ? `
+                <div class="message-attachment">
+                    <a href="${message.attachmentUrl || '#'}" target="_blank" class="attachment-link">
+                        <i class="fas fa-paperclip"></i>
+                        ${message.attachment}
+                    </a>
+                    ${isImage(message.attachment) && message.attachmentUrl ? `
+                        <div class="image-preview">
+                            <img src="${message.attachmentUrl}" alt="Image attachment" class="attachment-image" onerror="handleImageError(this)">
+                        </div>
+                    ` : isImage(message.attachment) ? `
+                        <div class="image-error">Image URL not available</div>
+                    ` : ''}
+                </div>
+            ` : ''}
+        `;
+
+        // Add to fragment
+        fragment.appendChild(messageElement);
+    });
+
+    // Remove "no messages" div if it exists
+    const noMessagesDiv = messagesContainer.querySelector('.no-messages');
+    if (noMessagesDiv) {
+        messagesContainer.removeChild(noMessagesDiv);
+    }
+
+    // Append all new messages at once
+    messagesContainer.appendChild(fragment);
 
     // Only scroll to bottom if user was already at the bottom
     if (isAtBottom) {

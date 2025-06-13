@@ -105,13 +105,15 @@ class ClientChatController extends Controller
             $q->where('from_id', $clientId)
               ->where('from_type', $clientType)
               ->where('to_id', $userId)
-              ->where('to_type', $userType);
+              ->where('to_type', $userType)
+            ->whereNull('read_at');
         })->orWhere(function ($q) use ($clientId, $userId, $clientType, $userType) {
             $q->where('from_id', $userId)
               ->where('from_type', $userType)
               ->where('to_id', $clientId)
-              ->where('to_type', $clientType);
-        });
+              ->where('to_type', $clientType)
+                ->whereNull('read_at');
+        })->whereNull('read_at');
 
         // If since parameter is provided, only get messages after that timestamp
         if ($since) {
@@ -126,8 +128,13 @@ class ClientChatController extends Controller
             return $message;
         });
 
-        // Count unread messages (messages to the client that haven't been read)
-        $unreadCount = ChMessage::where('to_id', $clientId)
+        // Mark messages from the other user as read
+        $this->markMessagesAsRead($clientId, $clientType, $userId, $userType);
+
+        // Count unread messages from this specific user only
+        $unreadCount = ChMessage::where('from_id', $userId)
+            ->where('from_type', $userType)
+            ->where('to_id', $clientId)
             ->where('to_type', $clientType)
             ->whereNull('read_at')
             ->count();
@@ -225,6 +232,7 @@ class ClientChatController extends Controller
         $message->from_type = $fromType;
         $message->to_id = $toId;
         $message->to_type = $toType;
+
 
         if ($attachment) {
             $fileName = uniqid() . '_' . $attachment->getClientOriginalName();
