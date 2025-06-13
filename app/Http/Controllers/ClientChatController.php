@@ -232,6 +232,7 @@ class ClientChatController extends Controller
         $message->from_type = $fromType;
         $message->to_id = $toId;
         $message->to_type = $toType;
+        $message->read_at = null;
 
 
         if ($attachment) {
@@ -243,6 +244,9 @@ class ClientChatController extends Controller
         }
 
         $message->save();
+
+            $message->isMine = true;
+
 
         return response()->json([
             'status' => 'success',

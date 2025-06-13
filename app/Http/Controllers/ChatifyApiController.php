@@ -125,7 +125,7 @@ class ChatifyApiController extends Controller
         });
 
         // Mark messages from the other user as read
-        $this->markMessagesAsRead($authId, $authType, $userId, $userType);
+//        $this->markMessagesAsRead($authId, $authType, $userId, $userType);
 
         // Count unread messages (messages to the authenticated user that haven't been read)
         $unreadCount = ChMessage::where('to_id', $authId)
