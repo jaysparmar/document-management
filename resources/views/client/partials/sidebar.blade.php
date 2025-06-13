@@ -1,7 +1,7 @@
 <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 bg-white" id="sidenav-main">
     <div class="sidenav-header">
         <a class="navbar-brand bg-dark m-0" href="{{ route('client-portal.home') }}">
-            <img src="{{ asset('assets/angular/browser/assets/images/logo.png') }}" class="navbar-brand-img h-100" alt="main_logo">
+            <img src="{{ url(\App\Models\CompanyProfiles::first()->logoUrl) }}" class="navbar-brand-img h-100" alt="main_logo">
 
         </a>
     </div>
