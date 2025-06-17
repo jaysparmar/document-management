@@ -168,4 +168,19 @@ return [
     'meeting_id' => 'Meeting ID',
     'created_on' => 'Created On',
     'back_to_meetings' => 'Back to Meetings',
+ 
+    'recent_documents' => 'Documents récents',
+    'document' => 'Document',
+    'category' => 'Catégorie',
+    'status' => 'Statut',
+    'date' => 'Date',
+    'no_documents_found' => 'Aucun document trouvé',
+    'categories_distribution' => 'Répartition par catégorie',
+     'recent_activity_timeline' => 'Recent Activity Timeline',
+    'no_recent_activities' => 'No recent activities',
+      'storage_statistics' => 'Storage Statistics',
+    'storage_used' => 'Storage Used',
+    'mb_used' => 'MB used',
+    'category_analytics' => 'Category Analytics',
+
 ];
