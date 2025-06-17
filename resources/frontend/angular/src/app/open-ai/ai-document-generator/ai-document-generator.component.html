@@ -34,8 +34,11 @@
               </div>
               <div class="row">
                 <div class="m-top-10 col-md-12">
-                  <button type="button" class="btn btn-primary btn-sm" (click)="saveDocument()">
+                  <button type="button" class="btn btn-primary btn-sm me-2" (click)="saveDocument()">
                     {{ "SAVE_AS_PDF" | translate }}
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" (click)="downloadPdf()">
+                    {{ "DOWNLOAD_PDF" | translate }}
                   </button>
                 </div>
               </div>

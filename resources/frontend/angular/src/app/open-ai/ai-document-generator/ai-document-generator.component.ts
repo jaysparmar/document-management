@@ -147,6 +147,34 @@ export class AiDocumentGeneratorComponent {
     }
   }
 
+  downloadPdf(): void {
+    if (this.aiEditorForm.valid) {
+      this.generatePdf().then(() => {
+        if (this.file) {
+          // Create a URL for the file
+          const fileURL = URL.createObjectURL(this.file);
+
+          // Create a link element
+          const downloadLink = document.createElement('a');
+          downloadLink.href = fileURL;
+          downloadLink.download = 'ai_document.pdf';
+
+          // Append to the document, click it, and remove it
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+
+          // Revoke the URL to free up memory
+          URL.revokeObjectURL(fileURL);
+
+          this.toastrService.success(this.translationService.getValue('DOCUMENT_DOWNLOADED_SUCCESSFULLY'));
+        }
+      });
+    } else {
+      this.aiEditorForm.markAllAsTouched(); // Mark all fields as touched to show validation errors
+    }
+  }
+
   openAddDocumentDialog(): void {
     const screenWidth = window.innerWidth;
     const dialogWidth = screenWidth < 768 ? '90vw' : '60vw';
