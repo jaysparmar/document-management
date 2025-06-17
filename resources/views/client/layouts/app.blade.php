@@ -70,6 +70,83 @@
     <script src="{{ asset('assets/client/js/custom.js') }}"></script>
     <script src="{{ asset('assets/client/js/chat-popup.js') }}"></script>
 
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+
     @stack('scripts')
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false,
+                // Chat messages are excluded from translation using the notranslate class
+                excludeIds: ['chatPopup']
+            }, 'google_translate_element');
+
+            // Add tooltip to the translate element
+            setTimeout(function() {
+                const translateElement = document.querySelector('#google_translate_element');
+                if (translateElement) {
+                    translateElement.setAttribute('title', 'Translate Page');
+                    translateElement.setAttribute('data-bs-toggle', 'tooltip');
+                    translateElement.setAttribute('data-bs-placement', 'bottom');
+                }
+            }, 1000);
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- Custom CSS to fix Google Translate appearance -->
+    <style>
+        .goog-te-gadget {
+            font-family: 'Open Sans', sans-serif !important;
+            font-size: 0.875rem !important;
+        }
+        .goog-te-gadget-simple {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            border-radius: 4px !important;
+            display: flex !important;
+            align-items: center !important;
+            cursor: pointer !important;
+        }
+        .goog-te-menu-value {
+            color: #67748e !important;
+            font-weight: 500 !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .goog-te-menu-value:hover {
+            color: #252f40 !important;
+            text-decoration: none !important;
+        }
+        .goog-te-menu-value span:first-child {
+            margin-right: 4px !important;
+        }
+        .goog-te-menu-value span:not(:first-child) {
+            display: none !important;
+        }
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+        body {
+            top: 0 !important;
+        }
+        .goog-te-menu-frame {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 8px !important;
+        }
+    </style>
 </body>
 </html>

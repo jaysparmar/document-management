@@ -1,4 +1,4 @@
-<div class="chat-popup" id="chatPopup" style="display: none;">
+<div class="chat-popup notranslate" id="chatPopup" style="display: none;">
     <div class="chat-popup-container">
         <!-- Header with controls -->
         <div class="popup-header">

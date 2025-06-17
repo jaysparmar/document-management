@@ -11,7 +11,18 @@
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
             <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
             <ul class="navbar-nav justify-content-end">
-
+                <!-- Google Translate Element -->
+                <li class="nav-item me-3">
+                    <div class="d-flex align-items-center">
+                        <div class="icon icon-shape bg-gradient-info shadow icon-sm rounded-circle text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-language text-white"></i>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-xs text-muted mb-1 d-none d-md-block">Translate</span>
+                            <div id="google_translate_element" class="mt-n1"></div>
+                        </div>
+                    </div>
+                </li>
 
                 <!-- Profile Dropdown -->
                 <li class="nav-item dropdown">
