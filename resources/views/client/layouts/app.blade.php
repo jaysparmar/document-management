@@ -77,7 +77,42 @@
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
+
+            // Initialize language dropdown
+            initLanguageDropdown();
         });
+
+        // Function to initialize the language dropdown
+        function initLanguageDropdown() {
+            const languageItems = document.querySelectorAll('#language-dropdown .dropdown-item');
+
+            languageItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-language');
+                    changeLanguage(lang);
+                });
+            });
+        }
+
+        // Function to change the language using Google Translate
+        function changeLanguage(lang) {
+            // Get the Google Translate select element
+            const gtCombo = document.querySelector('.goog-te-combo');
+
+            if (gtCombo) {
+                // Set the value to the selected language
+                gtCombo.value = lang;
+
+                // Trigger the change event
+                gtCombo.dispatchEvent(new Event('change'));
+
+                // Highlight the selected language in the dropdown
+                highlightSelectedLanguage(lang);
+            } else {
+                console.error('Google Translate element not found');
+            }
+        }
     </script>
 
     @stack('scripts')
@@ -87,21 +122,35 @@
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
+                includedLanguages: 'ar,de,en,es,fr,it,ja,pt,ru,zh-CN', // Limit to languages in our dropdown
                 layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
                 autoDisplay: false,
                 // Chat messages are excluded from translation using the notranslate class
                 excludeIds: ['chatPopup']
             }, 'google_translate_element');
 
-            // Add tooltip to the translate element
+            // After Google Translate is initialized, set up the custom dropdown
             setTimeout(function() {
-                const translateElement = document.querySelector('#google_translate_element');
-                if (translateElement) {
-                    translateElement.setAttribute('title', 'Translate Page');
-                    translateElement.setAttribute('data-bs-toggle', 'tooltip');
-                    translateElement.setAttribute('data-bs-placement', 'bottom');
+                // Check if the current language is set and update the dropdown
+                const currentLang = document.querySelector('.goog-te-combo').value;
+                if (currentLang) {
+                    highlightSelectedLanguage(currentLang);
                 }
             }, 1000);
+        }
+
+        // Function to highlight the selected language in the dropdown
+        function highlightSelectedLanguage(lang) {
+            // Remove active class from all items
+            document.querySelectorAll('#language-dropdown .dropdown-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Add active class to the selected language
+            const selectedItem = document.querySelector(`#language-dropdown .dropdown-item[data-language="${lang}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('active');
+            }
         }
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
@@ -156,6 +205,22 @@
         /* Hide Google Translate iframe */
         iframe.skiptranslate {
             display: none !important;
+        }
+
+        /* Custom language dropdown styles */
+        #language-dropdown .dropdown-item.active {
+            background-color: #e9ecef;
+            color: #252f40;
+            font-weight: 600;
+        }
+        #language-dropdown .dropdown-item.active::after {
+            content: '✓';
+            margin-left: 5px;
+            color: #5e72e4;
+        }
+        #language-dropdown .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
         }
     </style>
 </body>

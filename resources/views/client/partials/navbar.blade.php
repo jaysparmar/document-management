@@ -11,18 +11,32 @@
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
             <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
             <ul class="navbar-nav justify-content-end">
-                <!-- Google Translate Element -->
-                <li class="nav-item me-3">
-                    <div class="d-flex align-items-center">
-                        <div class="icon icon-shape bg-gradient-info shadow icon-sm rounded-circle text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fa fa-language text-white"></i>
+                    <!-- Custom Language Selector -->
+                <li class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="d-flex align-items-center">
+                            <div class="icon icon-shape bg-gradient-info shadow icon-sm rounded-circle text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="fa fa-language text-white"></i>
+                            </div>
+                            <span class="d-none d-md-inline-block">Language</span>
                         </div>
-                        <div class="d-flex flex-column">
-                            <span class="text-xs text-muted mb-1 d-none d-md-block">Translate</span>
-                            <div id="google_translate_element" class="mt-n1"></div>
-                        </div>
-                    </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" id="language-dropdown">
+                        <li><a class="dropdown-item" href="#" data-language="en">English</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="fr">Français</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="es">Español</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="de">Deutsch</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="it">Italiano</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="pt">Português</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="ru">Русский</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="ja">日本語</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="zh-CN">中文 (简体)</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="ar">العربية</a></li>
+                    </ul>
                 </li>
+
+                <!-- Hidden Google Translate Element -->
+                <div id="google_translate_element" style="display: none;"></div>
 
                 <!-- Profile Dropdown -->
                 <li class="nav-item dropdown">
