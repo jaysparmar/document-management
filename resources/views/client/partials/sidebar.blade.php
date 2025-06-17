@@ -2,7 +2,6 @@
     <div class="sidenav-header">
         <a class="navbar-brand bg-dark m-0" href="{{ route('client-portal.home') }}">
             <img src="{{ url(\App\Models\CompanyProfiles::first()->logoUrl) }}" class="navbar-brand-img h-100" alt="main_logo">
-
         </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -15,7 +14,7 @@
                     <div class="icon-wrapper me-2 {{ Request::is('client-portal') ? 'active-icon' : '' }}">
                         <i class="fas fa-th-large"></i>
                     </div>
-                    <span class="nav-link-text">Dashboard</span>
+                    <span class="nav-link-text">{{ __('client.dashboard') }}</span>
                 </a>
             </li>
 
@@ -26,7 +25,7 @@
                     <div class="icon-wrapper me-2 {{ Request::is('client-portal/documents*') ? 'active-icon' : '' }}">
                         <i class="fas fa-file-alt"></i>
                     </div>
-                    <span class="nav-link-text">My Documents</span>
+                    <span class="nav-link-text">{{ __('client.my_documents') }}</span>
                 </a>
             </li>
 
@@ -37,7 +36,7 @@
                     <div class="icon-wrapper me-2 {{ Request::is('client-portal/meetings*') ? 'active-icon' : '' }}">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <span class="nav-link-text">Meetings</span>
+                    <span class="nav-link-text">{{ __('client.meetings') }}</span>
                 </a>
             </li>
 
@@ -53,7 +52,7 @@
             </li> --}}
 
             <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">{{ __('client.profile') }}</h6>
             </li>
 
             {{-- Profile Settings --}}
@@ -63,7 +62,7 @@
                     <div class="icon-wrapper me-2 {{ Request::is('client-portal/profile*') ? 'active-icon' : '' }}">
                         <i class="fas fa-user"></i>
                     </div>
-                    <span class="nav-link-text">Profile Settings</span>
+                    <span class="nav-link-text">{{ __('client.profile_settings') }}</span>
                 </a>
             </li>
         </ul>

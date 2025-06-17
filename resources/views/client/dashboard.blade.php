@@ -24,11 +24,11 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">Total Documents
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">{{ __('client.total_documents') }}
                                 </p>
                                 <h5 class="font-weight-bolder mb-0">
                                     {{ $documentStats['total_documents'] }}
-                                    <span class="text-primary text-sm font-weight-bolder">All</span>
+                                    <span class="text-primary text-sm font-weight-bolder">{{ __('client.all') }}</span>
                                 </h5>
                             </div>
                         </div>
@@ -49,10 +49,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">Last 7 Days</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">{{ __('client.last_week') }}</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     {{ $documentStats['lastWeekCount'] }}
-                                    <span class="text-success text-sm font-weight-bolder">Documents</span>
+                                    <span class="text-success text-sm font-weight-bolder">{{ __('client.documents_label') }}</span>
                                 </h5>
                             </div>
                         </div>
@@ -73,10 +73,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">Last 30 Days</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">{{ __('client.last_month') }}</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     {{ $documentStats['lastMonthCount'] }}
-                                    <span class="text-warning text-sm font-weight-bolder">Documents</span>
+                                    <span class="text-warning text-sm font-weight-bolder">{{ __('client.documents_label') }}</span>
                                 </h5>
                             </div>
                         </div>
@@ -97,7 +97,7 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">Last 365 Days</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold text-muted">{{ __('client.last_year') }}</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     {{ $documentStats['lastYearCount'] }}
                                     <span class="text-danger text-sm font-weight-bolder">Documents</span>

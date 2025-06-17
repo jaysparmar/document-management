@@ -1,5 +1,5 @@
 @extends('client.layouts.app')
-@section('title', 'My Meetings')
+@section('title', __('client.my_meetings'))
 @section('content')
 <div class="container-fluid py-4">
     <!-- Meetings Table -->
@@ -7,10 +7,10 @@
         <div class="card-header pb-0">
             <div class="row">
                 <div class="col-lg-6 col-7">
-                    <h6>My Meetings</h6>
+                    <h6>{{ __('client.my_meetings') }}</h6>
                     <p class="text-sm mb-0">
                         <i class="fa fa-calendar text-info" aria-hidden="true"></i>
-                        <span class="font-weight-bold ms-1">All scheduled meetings</span>
+                        <span class="font-weight-bold ms-1">{{ __('client.all_scheduled_meetings') }}</span>
                     </p>
                 </div>
             </div>
@@ -19,13 +19,13 @@
             <table class="table align-items-center mb-0">
                 <thead>
                     <tr>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Start Time</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">End Time</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Created By</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Actions</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('client.meeting_title') }}</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('client.description') }}</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{{ __('client.start_time') }}</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{{ __('client.end_time') }}</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{{ __('client.created_by') }}</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{{ __('client.status') }}</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{{ __('client.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,9 +61,9 @@
                             </td>
                             <td>
                                 @if($meeting->pivot->is_accepted)
-                                    <span class="badge badge-sm bg-gradient-success">Accepted</span>
+                                    <span class="badge badge-sm bg-gradient-success">{{ __('client.accepted') }}</span>
                                 @else
-                                    <span class="badge badge-sm bg-gradient-warning">Pending</span>
+                                    <span class="badge badge-sm bg-gradient-warning">{{ __('client.pending') }}</span>
                                 @endif
                             </td>
                             <td class="align-middle">
@@ -76,13 +76,13 @@
                                     @if($meeting->pivot->is_accepted)
                                         <a href="{{ route('client-portal.meetings.join', $meeting->id) }}"
                                            class="btn btn-link text-primary text-gradient px-3 mb-0">
-                                            <i class="fas fa-video me-2"></i>Join
+                                            <i class="fas fa-video me-2"></i>{{ __('client.join') }}
                                         </a>
                                     @else
                                         <form action="{{ route('client-portal.meetings.accept', $meeting->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-link text-success text-gradient px-3 mb-0">
-                                                <i class="fas fa-check me-2"></i>Accept
+                                                <i class="fas fa-check me-2"></i>{{ __('client.accept') }}
                                             </button>
                                         </form>
                                     @endif
@@ -92,7 +92,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="text-center py-4">
-                                No meetings found
+                                {{ __('client.no_meetings') }}
                             </td>
                         </tr>
                     @endforelse

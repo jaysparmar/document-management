@@ -8,6 +8,7 @@ use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProfileController;
 use App\Http\Controllers\Client\DocumentController;
+use App\Http\Controllers\LanguageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,11 @@ use App\Http\Controllers\Client\DocumentController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// Language Switch Route
+Route::get('language/{locale}', [LanguageController::class, 'switchLang'])
+    ->name('language.switch')
+    ->where(['locale' => 'en|fr']);
 
 // Route::get('/', function () {
 //     return view('angular');
@@ -165,6 +171,13 @@ Route::get('/storage-link', function () {
     }
 });
 
+// Language Switch Route
+Route::get('language/{locale}', [LanguageController::class, 'switchLang'])->name('language.switch');
+
+// Client Portal Routes
+Route::prefix('client-portal')->name('client-portal.')->group(function () {
+    // ...existing code...
+});
 Route::any('/{any}', [AngularController::class, 'index'])
     ->where('any', '^(?!(api|install|update|chatify|storage|public|client-portal)).*$');
 

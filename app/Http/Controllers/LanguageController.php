@@ -136,4 +136,13 @@ class LanguageController extends Controller
             return '';
         }
     }
+
+    public function switchLang(string $locale)
+    {
+        if (in_array($locale, ['en', 'fr'])) {
+            session()->put('locale', $locale);
+            app()->setLocale($locale);
+        }
+        return redirect()->back();
+    }
 }

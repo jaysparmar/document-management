@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -216,5 +215,18 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Languages
+    |--------------------------------------------------------------------------
+    |
+    | This array contains the supported languages for the application.
+    |
+    */
+    'supported_languages' => [
+        'en' => 'English',
+        'fr' => 'Français',
+    ],
 
 ];

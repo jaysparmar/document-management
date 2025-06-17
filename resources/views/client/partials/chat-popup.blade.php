@@ -2,7 +2,7 @@
     <div class="chat-popup-container">
         <!-- Header with controls -->
         <div class="popup-header">
-            <div class="popup-title">Chat</div>
+            <div class="popup-title">{{ __('client.chat') }}</div>
             <div class="popup-controls">
                 <button class="btn btn-sm" id="closeChatPopup">
                     <i class="fas fa-times"></i>
@@ -17,7 +17,7 @@
                 <div class="popup-contacts-sidebar">
                     <div class="search-container">
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="searchQuery" placeholder="Search users">
+                            <input type="text" class="form-control" id="searchQuery" placeholder="{{ __('client.search_users') }}">
                             <button class="btn btn-outline-primary" type="button" id="searchUsersBtn">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -28,7 +28,7 @@
                         <!-- Contacts will be loaded here -->
                         <div class="loading-spinner text-center py-3">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">{{ __('client.loading') }}</span>
                             </div>
                         </div>
                     </div>
@@ -38,8 +38,8 @@
                 <div class="popup-chat-content">
                     <div class="no-chat-selected" id="noChatSelected">
                         <i class="fas fa-comments fa-3x mb-3 text-primary"></i>
-                        <h3>Select Chat</h3>
-                        <p>Select a user to start a chat</p>
+                        <h3>{{ __('client.select_chat') }}</h3>
+                        <p>{{ __('client.select_user_chat') }}</p>
                     </div>
 
                     <div class="chat-container" id="chatContainer" style="display: none;">
@@ -58,7 +58,7 @@
                             <form id="messageForm">
                                 <div class="input-row">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="messageInput" placeholder="Type a message">
+                                        <input type="text" class="form-control" id="messageInput" placeholder="{{ __('client.type_message') }}">
                                         <button type="button" class="btn btn-outline-primary" id="attachFileBtn">
                                             <i class="fas fa-paperclip"></i>
                                         </button>

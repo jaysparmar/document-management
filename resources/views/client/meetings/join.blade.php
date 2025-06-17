@@ -17,12 +17,12 @@
                 <div class="col-md-6">
                     <h5 class="mb-0">{{ $meeting->title }}</h5>
                     <p class="text-muted mb-0 text-sm">
-                        <i class="fas fa-user me-1"></i> Created by: {{ $meeting->creator->firstName ?? '' }} {{ $meeting->creator->lastName ?? '' }}
+                        <i class="fas fa-user me-1"></i> {{ __('client.created_by') }}: {{ $meeting->creator->firstName ?? '' }} {{ $meeting->creator->lastName ?? '' }}
                     </p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <button id="leave-meeting-btn" class="btn btn-danger">
-                        <i class="fas fa-phone-slash me-2"></i>Leave Meeting
+                        <i class="fas fa-phone-slash me-2"></i>{{ __('client.leave_meeting') }}
                     </button>
                 </div>
             </div>
@@ -34,15 +34,16 @@
         <div class="card-body">
             <div id="loading-indicator" class="text-center p-5">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
+                    <span class="sr-only">{{ __('client.loading') }}</span>
                 </div>
-                <p class="mt-2">Joining meeting...</p>
+                <p class="mt-2">{{ __('client.joining_meeting') }}</p>
             </div>
             <div id="jitsi-container" style="width: 100%; height: 600px;"></div>
         </div>
     </div>
 </div>
 @endsection
+
 
 @push('scripts')
 <script>
