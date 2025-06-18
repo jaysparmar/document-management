@@ -4,6 +4,7 @@ import { ChatPopupComponent } from '../chat-popup/chat-popup.component';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { ChatifyService } from '@core/services/chatify.service';
 
 @Component({
   selector: 'app-floating-chat-button',
@@ -14,9 +15,15 @@ export class FloatingChatButtonComponent implements OnInit, OnDestroy {
   isChatOpen = false;
   dialogRef: any;
   isOnChatPage = false;
+  unreadCount = 0;
   private routerSubscription: Subscription;
+  private chatifySubscription: Subscription;
 
-  constructor(private dialog: MatDialog, private router: Router) { }
+  constructor(
+    private dialog: MatDialog,
+    private router: Router,
+    private chatifyService: ChatifyService
+  ) { }
 
   ngOnInit(): void {
     // Check initial route
@@ -28,12 +35,54 @@ export class FloatingChatButtonComponent implements OnInit, OnDestroy {
     ).subscribe((event: NavigationEnd) => {
       this.isOnChatPage = event.url === '/chat';
     });
+
+    // Subscribe to unread count updates
+    this.chatifySubscription = this.chatifyService.getUnreadCountChanged()
+      .subscribe(count => {
+        this.unreadCount = count;
+      });
+
+    // Initial check for unread messages
+    this.checkUnreadMessages();
+
+    // Start polling for unread messages
+    this.startPollingForUnreadMessages();
   }
 
   ngOnDestroy(): void {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
+    if (this.chatifySubscription) {
+      this.chatifySubscription.unsubscribe();
+    }
+    // Stop polling when component is destroyed
+    this.stopPollingForUnreadMessages();
+  }
+
+  // Check for unread messages
+  private checkUnreadMessages(): void {
+    this.chatifyService.getUnreadCount()
+      .subscribe(
+        (response: any) => {
+          this.unreadCount = response.unread_count;
+        },
+        error => {
+          console.error('Failed to get unread count:', error);
+        }
+      );
+  }
+
+  // Start polling for unread messages
+  private startPollingForUnreadMessages(): void {
+    // Start polling for unread count every 2 seconds
+    this.chatifyService.startPollingForUnreadCount();
+  }
+
+  // Stop polling for unread messages
+  private stopPollingForUnreadMessages(): void {
+    // Stop polling for unread count
+    this.chatifyService.stopPollingForUnreadCount();
   }
 
   /**
@@ -64,6 +113,9 @@ export class FloatingChatButtonComponent implements OnInit, OnDestroy {
       });
 
       this.isChatOpen = true;
+
+      // Reset unread count when chat is opened
+      this.unreadCount = 0;
     }
   }
 }

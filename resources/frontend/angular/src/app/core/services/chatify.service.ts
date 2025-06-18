@@ -17,11 +17,18 @@ export class ChatifyService {
   private lastMessageTimestamp: string | null = null;
   private isFirstFetch: boolean = true;
   private pollingSubscription: Subscription | null = null;
+  private unreadCountPollingSubscription: Subscription | null = null;
   private _isPolling: boolean = false;
+  private _isPollingUnreadCount: boolean = false;
 
   // Public getter for isPolling
   get isPolling(): boolean {
     return this._isPolling;
+  }
+
+  // Public getter for isPollingUnreadCount
+  get isPollingUnreadCount(): boolean {
+    return this._isPollingUnreadCount;
   }
 
   constructor(
@@ -86,6 +93,43 @@ export class ChatifyService {
     this._isPolling = false;
     this.selectedUserId = null;
     this.lastMessageTimestamp = null;
+  }
+
+  // Start polling for unread count
+  startPollingForUnreadCount(): void {
+    // Stop any existing polling before starting a new one
+    this.stopPollingForUnreadCount();
+
+    this._isPollingUnreadCount = true;
+
+    // Set up polling interval
+    this.unreadCountPollingSubscription = interval(this.pollingInterval)
+      .pipe(
+        switchMap(() => this.getUnreadCount())
+      )
+      .subscribe(
+        (response: any) => {
+          // Only update unread count if it has changed
+          if (response.unreadCount !== this.lastUnreadCount) {
+            this.lastUnreadCount = response.unreadCount;
+            this.unreadCountChanged.next(response.unreadCount);
+          }
+        },
+        error => {
+          console.error('Error polling for unread count:', error);
+        }
+      );
+  }
+
+  // Stop polling for unread count
+  stopPollingForUnreadCount(): void {
+    // Unsubscribe from the polling subscription if it exists
+    if (this.unreadCountPollingSubscription) {
+      this.unreadCountPollingSubscription.unsubscribe();
+      this.unreadCountPollingSubscription = null;
+    }
+
+    this._isPollingUnreadCount = false;
   }
 
   // Fetch new messages since a given timestamp

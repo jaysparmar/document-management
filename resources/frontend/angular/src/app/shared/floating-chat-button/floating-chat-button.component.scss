@@ -7,10 +7,31 @@
   button {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
+    position: relative; // Required for absolute positioning of the badge
 
     &:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #ff4081; // Pink accent color
+      color: white;
+      border-radius: 50%;
+      min-width: 20px;
+      height: 20px;
+      font-size: 12px;
+      line-height: 20px;
+      text-align: center;
+      padding: 0 4px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }
