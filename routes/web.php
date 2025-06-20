@@ -21,6 +21,7 @@ use App\Http\Controllers\LanguageController;
 |
 */
 
+
 // Language Switch Route
 Route::get('language/{locale}', [LanguageController::class, 'switchLang'])
     ->name('language.switch')

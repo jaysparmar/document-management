@@ -16,8 +16,8 @@
 
     .chat-badge {
       position: absolute;
-      top: -8px;
-      right: -8px;
+      top: 0;
+      right: 0;
       background-color: #ff4081; // Pink accent color
       color: white;
       border-radius: 50%;
@@ -32,6 +32,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transform: translate(50%, -50%); // This will position the badge properly at the top-right corner
     }
   }
 }

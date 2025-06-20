@@ -5,7 +5,7 @@ return [
     'language' => 'Language',
     'english' => 'English',
     'french' => 'French',
-    
+
     'my_meetings' => 'My Meetings',
 
     // Auth
@@ -17,13 +17,13 @@ return [
     'remember_me' => 'Remember Me',
     'forgot_password' => 'Forgot your password?',
     'reset_here' => 'Reset here',
-    
+
     // Navigation
     'dashboard' => 'Dashboard',
     'my_documents' => 'My Documents',
     'meetings' => 'Meetings',
     'profile_settings' => 'Profile Settings',
-    
+
     // Documents
     'search_documents' => 'Search documents...',
     'all_categories' => 'All Categories',
@@ -37,7 +37,6 @@ return [
     'date' => 'Date',
     'actions' => 'Actions',
     'view' => 'View',
-    'no_documents_found' => 'No documents found',
     'showing' => 'Showing',
     'to' => 'to',
     'of' => 'of',
@@ -45,7 +44,7 @@ return [
     'recent_documents' => 'Recent Documents',
     'monthly_uploads' => 'Monthly Document Uploads',
     'recent_activity' => 'Recent Activity Timeline',
-    
+
     // Profile
     'profile' => 'Profile',
     'edit_profile' => 'Edit Profile',
@@ -59,7 +58,7 @@ return [
     'confirm_password' => 'Confirm Password',
     'save_changes' => 'Save Changes',
     'cancel' => 'Cancel',
-    
+
     // Stats
     'total_documents' => 'Total Documents',
     'documents_this_month' => 'Documents This Month',
@@ -76,7 +75,7 @@ return [
     'error_occurred' => 'An error occurred',
     'changes_saved' => 'Changes saved successfully',
     'password_updated' => 'Password updated successfully',
-    
+
     // Meetings
     'my_meetings' => 'My Meetings',
     'all_scheduled_meetings' => 'All scheduled meetings',
@@ -122,7 +121,6 @@ return [
     'date' => 'Date',
     'actions' => 'Actions',
     'view' => 'View',
-    'no_documents_found' => 'No documents found.',
     'showing' => 'Showing',
     'to' => 'to',
     'of' => 'of',
@@ -168,7 +166,7 @@ return [
     'meeting_id' => 'Meeting ID',
     'created_on' => 'Created On',
     'back_to_meetings' => 'Back to Meetings',
- 
+
     'recent_documents' => 'Documents récents',
     'document' => 'Document',
     'category' => 'Catégorie',
@@ -182,5 +180,5 @@ return [
     'storage_used' => 'Storage Used',
     'mb_used' => 'MB used',
     'category_analytics' => 'Category Analytics',
-
+    "all_rights_reserved"=> "All rights reserved."
 ];

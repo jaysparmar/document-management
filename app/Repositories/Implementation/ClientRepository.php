@@ -3,6 +3,7 @@
 namespace App\Repositories\Implementation;
 
 use App\Models\Clients;
+use App\Models\CompanyProfiles;
 use App\Repositories\Implementation\BaseRepository;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\Contracts\EmailRepositoryInterface;
@@ -76,9 +77,17 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
     {
         // Generate login URL
         $loginUrl = route('client-portal.login');
-
+        try {
+            $appName = CompanyProfiles::first()->title;
+        }catch (\Exception $e) {
+            $appName = config('app.name');
+        }
         // Create email content
-        $subject = 'Welcome to ' . config('app.name') . ' - Your Account Details';
+        $subject = 'Welcome to ' . $appName . ' - Your Account Details';
+
+
+
+
 
         // Create HTML email template
         $message = '
@@ -139,7 +148,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
         <body>
             <div class="container">
                 <div class="header">
-                    <h2>Bienvenue sur ' . config('app.name') . '</h2>
+                    <h2>Bienvenue sur ' . $appName . '</h2>
                 </div>
                 <div class="content">
                     <p>Bonjour ' . $client->contactPerson . ',</p>
@@ -161,7 +170,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
 
                     <p>Merci d’avoir choisi nos services !</p>
 
-                    <p>Cordialement,<br>L’équipe ' . config('app.name') . '</p>
+                    <p>Cordialement,<br>L’équipe ' . $appName . '</p>
                 </div>
                 <div class="footer">
                     <p>Ceci est un e-mail automatique. Merci de ne pas répondre à ce message.</p>

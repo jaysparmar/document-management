@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Clients;
 use Illuminate\Http\Request;
 use App\Repositories\Contracts\ClientRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
@@ -62,6 +64,15 @@ class ClientController extends Controller
 
     public function delete($id)
     {
-        return  response($this->clientRepositoryInterface->delete($id), 204);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        $client = Clients::findOrFail($id);
+        $client->delete();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        return response([], 204);
     }
+
+
 }
